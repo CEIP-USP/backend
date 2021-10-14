@@ -1,3 +1,7 @@
+import {
+  TextSearchableQuery,
+  TextSearchableQueryParams,
+} from 'common/pagedQuery';
 import { IProfileDataPort } from './ports/profileDataPort';
 import { IDocument, Profile } from './profile';
 
@@ -36,5 +40,13 @@ export default class ProfileUseCases {
       dayOfSecondShot
     );
     return this.profileDataPort.save(profile);
+  }
+
+  public findByText({
+    q,
+    skip,
+    take,
+  }: TextSearchableQueryParams): Promise<TextSearchableQuery<Profile>> {
+    return this.profileDataPort.findByText({ q, skip, take });
   }
 }
