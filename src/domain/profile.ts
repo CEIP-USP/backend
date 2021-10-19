@@ -1,4 +1,6 @@
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
+import { Role, RoleType } from './role';
+import { uuid } from 'uuidv4';
 
 export interface Contact {
   email?: string;
@@ -7,15 +9,27 @@ export interface Contact {
 }
 
 export class Profile {
+  public id: string = uuid();
   public services: string[] = [];
   public responsibleForValidation = '';
-  private _dayOfSecondShot: Date | null = null;
+  public _role: Role = new Role(RoleType.User);
 
   constructor(
     public name: string,
     public cpf: string | null = null, // TODO: validate in the future
-    private _contact: Contact = {}
-  ) {}
+    private _contact: Contact = {},
+    private _dayOfSecondShot: Date | null
+  ) {
+    if (!_dayOfSecondShot || _dayOfSecondShot.getTime() >= Date.now()) {
+      throw new InvalidSecondShotDateError();
+    }
+
+    this.dayOfSecondShot = _dayOfSecondShot;
+  }
+
+  public set role(role: Role) {
+    this.role = role;
+  }
 
   public set phone(phone: string[]) {
     this._contact.phone = phone;
@@ -34,10 +48,6 @@ export class Profile {
   }
 
   public set dayOfSecondShot(dayOfSecondShot: Date | null) {
-    if (!dayOfSecondShot || dayOfSecondShot.getTime() >= Date.now()) {
-      throw new InvalidSecondShotDateError();
-    }
-
     this._dayOfSecondShot = dayOfSecondShot;
   }
 
