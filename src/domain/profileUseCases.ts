@@ -42,11 +42,9 @@ export default class ProfileUseCases {
     return this.profileDataPort.save(profile);
   }
 
-  public findByText({
-    q,
-    skip,
-    take,
-  }: TextSearchableQueryParams): Promise<TextSearchableQuery<Profile>> {
-    return this.profileDataPort.findByText({ q, skip, take });
+  public findByText(
+    params: TextSearchableQueryParams
+  ): Promise<TextSearchableQuery<Profile>> {
+    return this.profileDataPort.findByText(params);
   }
 }
