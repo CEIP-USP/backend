@@ -31,6 +31,6 @@ const controller = new ProfileController(profileUseCases, port);
 
 app.use('/profile', controller.router);
 
-app.listen(3000, () => {
-  console.log('Server Running on 3000!!');
+app.listen(process.env.PORT, () => {
+  console.log(`Server Running on ${process.env.PORT}!`);
 });
