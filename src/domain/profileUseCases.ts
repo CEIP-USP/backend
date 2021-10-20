@@ -1,5 +1,10 @@
-import { IProfileDataPort } from './ports/profileDataPort';
 import { Contact, Profile } from './profile';
+import {
+  TextSearchableQuery,
+  TextSearchableQueryParams,
+} from 'common/pagedQuery';
+
+import { IProfileDataPort } from './ports/profileDataPort';
 
 export interface PreRegistrationData {
   name: string;
@@ -22,5 +27,11 @@ export default class ProfileUseCases {
       profile.dayOfSecondShot = dayOfSecondShot;
     }
     return this.profileDataPort.save(profile);
+  }
+
+  public findByText(
+    params: TextSearchableQueryParams
+  ): Promise<TextSearchableQuery<Profile>> {
+    return this.profileDataPort.findByText(params);
   }
 }

@@ -1,6 +1,5 @@
-import { Request, Response, Router, json } from 'express';
+import { Request, Response, Router } from 'express';
 
-import { IProfileDataPort } from 'domain/ports/profileDataPort';
 import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
 import { Profile } from 'domain/profile';
 import ProfileUseCases from 'domain/profileUseCases';
@@ -8,10 +7,7 @@ import { TextSearchableQuery } from 'common/pagedQuery';
 
 export class ProfileController {
   private _router: Router;
-  constructor(
-    protected readonly profileUseCases: ProfileUseCases,
-    protected readonly profileDataPort: IProfileDataPort
-  ) {
+  constructor(protected readonly profileUseCases: ProfileUseCases) {
     this._router = Router();
     this.mapRoutes();
   }
@@ -46,7 +42,7 @@ export class ProfileController {
       const skip = parseIntFromQuery(_skip) || 0;
       const take = Math.min(parseIntFromQuery(_take) || 10, 50);
 
-      const result = (await this.profileDataPort.findByText({
+      const result = (await this.profileUseCases.findByText({
         q,
         skip,
         take,
