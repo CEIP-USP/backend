@@ -19,20 +19,20 @@ export default class ProfileUseCases {
     name,
     email,
     password,
+    hasSecondShot,
+    document,
     phone,
     address,
-    hasSecondShot,
     dayOfSecondShot,
-    document,
   }: PreRegistrationData): Promise<Profile> {
     const profile = new Profile(
       name,
       email,
       password,
+      hasSecondShot,
       document,
       phone,
       address,
-      hasSecondShot,
       dayOfSecondShot
     );
     return this.profileDataPort.save(profile);

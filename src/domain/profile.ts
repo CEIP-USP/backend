@@ -5,24 +5,36 @@ export interface IDocument {
   value?: string;
 }
 
+export interface VaccineStatus {
+  vaccinated: boolean;
+  dayOfSecondShot?: Date;
+}
+
 export class Profile {
   public services: string[] = [];
   public responsibleForValidation = '';
-  public _dayOfSecondShot: Date;
+  public readonly vaccineStatus: VaccineStatus;
 
   constructor(
     public name: string,
     public email: string,
     public password: string,
+    hasSecondShot: boolean,
     public document: IDocument = { type: 'undocumented' },
     public phone = '',
     public address = '',
-    public hasSecondShot = true,
-    dayOfSecondShot = new Date()
+    dayOfSecondShot: Date | undefined = undefined
   ) {
-    if (!dayOfSecondShot || dayOfSecondShot.getTime() >= Date.now()) {
+    if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
     }
-    this._dayOfSecondShot = dayOfSecondShot;
+
+    const status: VaccineStatus = { vaccinated: hasSecondShot };
+
+    if (hasSecondShot) {
+      status.dayOfSecondShot = dayOfSecondShot;
+    }
+
+    this.vaccineStatus = status;
   }
 }
