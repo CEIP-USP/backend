@@ -1,11 +1,15 @@
 import { IProfileDataPort } from './ports/profileDataPort';
-import { Contact, Profile } from './profile';
+import { IDocument, Profile } from './profile';
 
 export interface PreRegistrationData {
   name: string;
-  cpf?: string;
-  contact: Contact;
+  email: string;
+  password: string;
+  phone?: string;
+  address?: string;
+  hasSecondShot: boolean;
   dayOfSecondShot?: Date;
+  document: IDocument;
 }
 
 export default class ProfileUseCases {
@@ -13,14 +17,24 @@ export default class ProfileUseCases {
 
   public performPreRegistration({
     name,
-    cpf,
-    contact,
+    email,
+    password,
+    hasSecondShot,
+    document,
+    phone,
+    address,
     dayOfSecondShot,
   }: PreRegistrationData): Promise<Profile> {
-    const profile = new Profile(name, cpf, contact);
-    if (dayOfSecondShot) {
-      profile.dayOfSecondShot = dayOfSecondShot;
-    }
+    const profile = new Profile(
+      name,
+      email,
+      password,
+      hasSecondShot,
+      document,
+      phone,
+      address,
+      dayOfSecondShot
+    );
     return this.profileDataPort.save(profile);
   }
 }
