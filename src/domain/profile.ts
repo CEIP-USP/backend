@@ -20,7 +20,7 @@ export class Profile {
     public email: string,
     public password: string,
     hasSecondShot: boolean,
-    public document: IDocument = { type: 'undocumented' },
+    public document: IDocument,
     public phone = '',
     public address = '',
     dayOfSecondShot: Date | undefined = undefined
