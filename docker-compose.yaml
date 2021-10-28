@@ -9,3 +9,10 @@ services:
       - ./:/usr/src/app
     env_file:
       - .env
+  db:
+    image: mongo:4.4.1-bionic
+    volumes:
+      - dbdata:/data/db
+
+volumes:
+  dbdata:

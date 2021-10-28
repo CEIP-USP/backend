@@ -1,12 +1,15 @@
 import express, { Application, Request, Response, json } from 'express';
-import { ProfileController } from 'controllers/profile.controller';
+import { ProfileController } from 'app/controllers/profile.controller';
 import { IProfileDataPort } from 'domain/ports/profileDataPort';
 import ProfileUseCases from 'domain/profileUseCases';
 import cors from 'cors';
+import setupDb from 'app/database';
 
 const app: Application = express();
 app.use(json());
 app.use(cors());
+
+setupDb();
 
 const port: IProfileDataPort = {
   save: async (p) => {
