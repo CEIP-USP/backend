@@ -23,7 +23,7 @@ export class Profile {
     public document: IDocument,
     public phone = '',
     public address = '',
-    dayOfSecondShot: Date | undefined = undefined
+    public dayOfSecondShot: Date | undefined = undefined
   ) {
     if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
