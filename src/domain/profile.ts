@@ -37,4 +37,8 @@ export class Profile {
 
     this.vaccineStatus = status;
   }
+
+  public verifyPassword(password: string): boolean | Promise<boolean> {
+    return this.password === password;
+  }
 }

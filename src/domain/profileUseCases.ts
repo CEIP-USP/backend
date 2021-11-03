@@ -48,4 +48,14 @@ export default class ProfileUseCases {
   ): Promise<TextSearchableQuery<Profile>> {
     return this.profileDataPort.findByText(params);
   }
+
+  public async verifyCredentials(
+    email: string,
+    password: string
+  ): Promise<Profile | undefined> {
+    const profile = await this.profileDataPort.findByEmail(email);
+    if (!profile) return undefined;
+    if (await profile.verifyPassword(password)) return profile;
+    return undefined;
+  }
 }

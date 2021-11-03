@@ -10,4 +10,5 @@ export interface IProfileDataPort {
   findByText: (
     params: TextSearchableQueryParams
   ) => Promise<TextSearchableQuery<Profile>>;
+  findByEmail(email: string): Promise<Profile | undefined>;
 }
