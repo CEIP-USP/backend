@@ -27,7 +27,7 @@ const port: IProfileDataPort = {
 
 const profileUseCases = new ProfileUseCases(port);
 
-const controller = new ProfileController(profileUseCases, port);
+const controller = new ProfileController(profileUseCases);
 
 app.use('/profile', controller.router);
 

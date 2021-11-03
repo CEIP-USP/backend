@@ -1,47 +1,40 @@
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
 
-export interface Contact {
-  email?: string;
-  phone?: string[];
-  address?: string;
+export interface IDocument {
+  type: string;
+  value?: string;
+}
+
+export interface VaccineStatus {
+  vaccinated: boolean;
+  dayOfSecondShot?: Date;
 }
 
 export class Profile {
   public services: string[] = [];
   public responsibleForValidation = '';
-  private _dayOfSecondShot: Date | null = null;
+  public readonly vaccineStatus: VaccineStatus;
 
   constructor(
     public name: string,
-    public cpf: string | null = null, // TODO: validate in the future
-    private _contact: Contact = {}
-  ) {}
-
-  public set phone(phone: string[]) {
-    this._contact.phone = phone;
-  }
-
-  public set email(email: string) {
-    this._contact.email = email;
-  }
-
-  public set address(address: string) {
-    this._contact.address = address;
-  }
-
-  public get contact(): Contact {
-    return this._contact;
-  }
-
-  public set dayOfSecondShot(dayOfSecondShot: Date | null) {
-    if (!dayOfSecondShot || dayOfSecondShot.getTime() >= Date.now()) {
+    public email: string,
+    public password: string,
+    hasSecondShot: boolean,
+    public document: IDocument,
+    public phone = '',
+    public address = '',
+    dayOfSecondShot: Date | undefined = undefined
+  ) {
+    if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
     }
 
-    this._dayOfSecondShot = dayOfSecondShot;
-  }
+    const status: VaccineStatus = { vaccinated: hasSecondShot };
 
-  public get dayOfSecondShot(): Date | null {
-    return this._dayOfSecondShot;
+    if (hasSecondShot) {
+      status.dayOfSecondShot = dayOfSecondShot;
+    }
+
+    this.vaccineStatus = status;
   }
 }
