@@ -17,7 +17,7 @@ async function main() {
   const app: Application = express();
   app.use(passport.initialize());
   app.use(json());
-  app.use(cors());
+  app.use(cors({ credentials: true, origin: process.env.CORS }));
   app.use(cookies());
 
   const port: IProfileDataPort = {
