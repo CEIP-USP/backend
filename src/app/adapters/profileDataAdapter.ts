@@ -1,24 +1,40 @@
-import { ProfileEntity } from 'app/entities/ProfileEntity';
 import { IProfileDataPort } from 'domain/ports/profileDataPort';
 import { Profile } from 'domain/profile';
-import { Collection, Db } from 'mongodb';
+import { Collection, Db, Document } from 'mongodb';
 
-// const profileFromEntity = (
-//   entity: Promise<ProfileEntity>
-// ): Promise<Profile> => {
-//   entity;
-// };
+const documentToProfile = ({
+  name,
+  email,
+  password,
+  hasSecondShot,
+  document,
+  phone,
+  address,
+  dayOfSecondShot,
+}: Document) => {
+  return new Profile(
+    name,
+    email,
+    password,
+    hasSecondShot,
+    document,
+    phone,
+    address,
+    dayOfSecondShot
+  );
+};
 
 export class ProfileDataAdapter implements IProfileDataPort {
-  private profileCollection: Collection<Document>;
+  private profileCollection: Collection;
   constructor(database: Db) {
-    this.profileCollection = database.collection('pre-register');
+    this.profileCollection = database.collection('profiles');
   }
 
   save = async (profile: Profile): Promise<Profile> => {
     const result = await this.profileCollection.insertOne(profile);
-    return (await this.profileCollection.findOne({
+    const savedProfile: Document | null = await this.profileCollection.findOne({
       _id: result.insertedId,
-    })) as unknown as Profile;
+    });
+    return documentToProfile(savedProfile as Document);
   };
 }

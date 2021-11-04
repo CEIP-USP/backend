@@ -10,8 +10,10 @@ const app: Application = express();
 app.use(json());
 app.use(cors());
 
-setupDb().then((db) => {
+async function main() {
   try {
+    const db = await setupDb();
+
     const profileDataAdapter = new ProfileDataAdapter(db as Db);
 
     const profileUseCases = new ProfileUseCases(profileDataAdapter);
@@ -28,6 +30,8 @@ setupDb().then((db) => {
       res.status(200).send({ data: 'Hello, world!' });
     });
   } catch (e) {
-    console.error('Wow, so many wow');
+    console.error(e);
   }
-});
+}
+
+main();
