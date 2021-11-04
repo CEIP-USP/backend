@@ -16,6 +16,7 @@ export class AuthController {
   private async loginRoute(req: Request, res: Response) {
     if (!req.user) throw new Error('User not found');
     this.jwtService.signRefresh(req, res, req.user as Profile);
+    this.jwtService.signAccess(res, req.user as Profile);
     res.status(201).send();
   }
 
