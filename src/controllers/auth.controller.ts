@@ -1,33 +1,44 @@
+import { JwtService } from 'auth/services/jwt.service';
 import { Profile } from 'domain/profile';
-import { Router } from 'express';
-import passport from 'passport';
+import { Request, RequestHandler, Response, Router } from 'express';
 
 export class AuthController {
   private _router = Router();
 
   constructor(
-    verifyCredentials: (username, password) => Promise<Profile | undefined>,
-    verifyAccessToken: (token) => Promise<Profile | undefined>,
-    verifyRefreshToken: (token) => Promise<Profile | undefined>
+    private readonly basicAuthMiddleware: RequestHandler,
+    private readonly refreshTokenMiddleware: RequestHandler,
+    private readonly jwtService: JwtService
   ) {
     this.mapRoutes();
   }
 
-  private async loginRoute(req: Request & { user: Profile }, res: Response) {
-    const profile = req.user;
-    res.json();
+  private async loginRoute(req: Request, res: Response) {
+    if (!req.user) throw new Error('User not found');
+    this.jwtService.signRefresh(req, res, req.user as Profile);
+    res.status(201).send();
   }
 
-  private async mapLogin() {
-    passport.use();
-    this._router.post('/login', passport.authenticate('local'));
+  private async refreshRoute(req: Request, res: Response) {
+    if (!req.user) throw new Error('User not found');
+    this.jwtService.signAccess(res, req.user as Profile);
+    res.status(201).send();
   }
 
   private mapRoutes() {
-    this.mapLogin();
+    this._router.post(
+      '/login',
+      this.basicAuthMiddleware,
+      this.loginRoute.bind(this)
+    );
+    this._router.post(
+      '/refresh',
+      this.refreshTokenMiddleware,
+      this.refreshRoute.bind(this)
+    );
   }
 
   public get router(): Router {
-    return this.router;
+    return this._router;
   }
 }
