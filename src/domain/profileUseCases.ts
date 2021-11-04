@@ -49,6 +49,10 @@ export default class ProfileUseCases {
     return this.profileDataPort.findByText(params);
   }
 
+  public findByEmail(email: string): Promise<Profile | undefined> {
+    return this.profileDataPort.findByEmail(email);
+  }
+
   public async verifyCredentials(
     email: string,
     password: string

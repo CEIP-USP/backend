@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint '**/*.{ts,js}' --fix",
+    "format": "prettier --write '**/*.{ts,js}'"
   },
   "repository": {
     "type": "git",
@@ -18,11 +20,13 @@
     "url": "https://github.com/CEIP-USP/backend/issues"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^16.10.2",
     "@types/passport-http": "^0.3.9",
+    "@types/passport-jwt": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
     "eslint": "^7.32.0",
@@ -36,10 +40,12 @@
   },
   "dependencies": {
     "@types/passport": "^1.0.7",
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "passport": "^0.5.0",
-    "passport-http": "^0.3.0"
+    "passport-http": "^0.3.0",
+    "passport-jwt": "^4.0.0"
   }
 }

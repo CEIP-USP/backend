@@ -1,13 +1,15 @@
-import { Request, Response, Router } from 'express';
-
+import { TextSearchableQuery } from 'common/pagedQuery';
 import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
 import { Profile } from 'domain/profile';
 import ProfileUseCases from 'domain/profileUseCases';
-import { TextSearchableQuery } from 'common/pagedQuery';
+import { Request, RequestHandler, Response, Router } from 'express';
 
 export class ProfileController {
   private _router: Router;
-  constructor(protected readonly profileUseCases: ProfileUseCases) {
+  constructor(
+    protected readonly profileUseCases: ProfileUseCases,
+    protected readonly accessTokenMiddleware: RequestHandler
+  ) {
     this._router = Router();
     this.mapRoutes();
   }
@@ -56,7 +58,11 @@ export class ProfileController {
 
   private mapRoutes() {
     this._router.post('/', this.preRegister.bind(this));
-    this._router.get('/', this.getProfile.bind(this));
+    this._router.get(
+      '/',
+      this.accessTokenMiddleware,
+      this.getProfile.bind(this)
+    );
   }
 
   public get router(): Router {
