@@ -1,30 +1,37 @@
 import express, { Application, Request, Response, json } from 'express';
-import { ProfileController } from 'controllers/profile.controller';
-import { IProfileDataPort } from 'domain/ports/profileDataPort';
+import { ProfileController } from 'app/controllers/profile.controller';
 import ProfileUseCases from 'domain/profileUseCases';
 import cors from 'cors';
+import setupDb from 'app/database';
+import { ProfileDataAdapter } from 'app/adapters/profileDataAdapter';
+import { Db } from 'mongodb';
 
 const app: Application = express();
 app.use(json());
 app.use(cors());
 
-const port: IProfileDataPort = {
-  save: async (p) => {
-    console.log('saved ', p);
-    return p;
-  },
-};
+async function main() {
+  try {
+    const db = await setupDb();
 
-const profileUseCases = new ProfileUseCases(port);
+    const profileDataAdapter = new ProfileDataAdapter(db as Db);
 
-const controller = new ProfileController(profileUseCases);
+    const profileUseCases = new ProfileUseCases(profileDataAdapter);
 
-app.use('/profile', controller.router);
+    const controller = new ProfileController(profileUseCases);
 
-app.listen(3000, () => {
-  console.log('Server Running on 3000!');
-});
+    app.use('/profile', controller.router);
 
-app.use('/', (req: Request, res: Response) => {
-  res.status(200).send({ data: 'Hello, world!' });
-});
+    app.listen(process.env.PORT, () => {
+      console.log(`Server Running on ${process.env.PORT}!`);
+    });
+
+    app.use('/', (req: Request, res: Response) => {
+      res.status(200).send({ data: 'Hello, world!' });
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+main();

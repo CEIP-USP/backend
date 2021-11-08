@@ -2,56 +2,47 @@ import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateEr
 import { Role, RoleType } from './role';
 import { uuid } from 'uuidv4';
 
-export interface Contact {
-  email?: string;
-  phone?: string[];
-  address?: string;
+export interface IDocument {
+  type: string;
+  value?: string;
+}
+
+export interface VaccineStatus {
+  vaccinated: boolean;
+  dayOfSecondShot?: Date;
 }
 
 export class Profile {
   public id: string = uuid();
   public services: string[] = [];
   public responsibleForValidation = '';
+  public readonly vaccineStatus: VaccineStatus;
   public _role: Role = new Role(RoleType.User);
 
   constructor(
     public name: string,
-    public cpf: string | null = null, // TODO: validate in the future
-    private _contact: Contact = {},
-    private _dayOfSecondShot: Date | null
+    public email: string,
+    public password: string,
+    hasSecondShot: boolean,
+    public document: IDocument,
+    public phone = '',
+    public address = '',
+    public dayOfSecondShot: Date | undefined = undefined
   ) {
-    if (!_dayOfSecondShot || _dayOfSecondShot.getTime() >= Date.now()) {
+    if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
     }
 
-    this.dayOfSecondShot = _dayOfSecondShot;
+    const status: VaccineStatus = { vaccinated: hasSecondShot };
+
+    if (hasSecondShot) {
+      status.dayOfSecondShot = dayOfSecondShot;
+    }
+
+    this.vaccineStatus = status;
   }
 
   public set role(role: Role) {
     this.role = role;
-  }
-
-  public set phone(phone: string[]) {
-    this._contact.phone = phone;
-  }
-
-  public set email(email: string) {
-    this._contact.email = email;
-  }
-
-  public set address(address: string) {
-    this._contact.address = address;
-  }
-
-  public get contact(): Contact {
-    return this._contact;
-  }
-
-  public set dayOfSecondShot(dayOfSecondShot: Date | null) {
-    this._dayOfSecondShot = dayOfSecondShot;
-  }
-
-  public get dayOfSecondShot(): Date | null {
-    return this._dayOfSecondShot;
   }
 }
