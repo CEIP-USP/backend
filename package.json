@@ -37,7 +37,6 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "uuidv4": "^6.2.12",
     "mongodb": "^4.1.3"
   }
 }

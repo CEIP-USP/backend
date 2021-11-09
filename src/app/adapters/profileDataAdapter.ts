@@ -3,6 +3,7 @@ import { Profile } from 'domain/profile';
 import { Collection, Db, Document } from 'mongodb';
 
 const documentToProfile = ({
+  id,
   name,
   email,
   password,
@@ -13,6 +14,7 @@ const documentToProfile = ({
   dayOfSecondShot,
 }: Document) => {
   return new Profile(
+    id,
     name,
     email,
     password,
@@ -27,7 +29,9 @@ const documentToProfile = ({
 export class ProfileDataAdapter implements IProfileDataPort {
   private profileCollection: Collection;
   constructor(database: Db) {
-    this.profileCollection = database.collection('profiles');
+    this.profileCollection = database.collection(
+      process.env.PROFILE_COLLECTION as string
+    );
   }
 
   save = async (profile: Profile): Promise<Profile> => {
@@ -36,5 +40,12 @@ export class ProfileDataAdapter implements IProfileDataPort {
       _id: result.insertedId,
     });
     return documentToProfile(savedProfile as Document);
+  };
+
+  findById = async (_id: string): Promise<Profile> => {
+    const profile: Document | null = await this.profileCollection.findOne({
+      _id,
+    });
+    return documentToProfile(profile as Document);
   };
 }

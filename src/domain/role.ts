@@ -1,10 +1,18 @@
+import { InvalidRoleType } from './exceptions/InvalidRoleType';
+
 export class Role {
-  constructor(public role: RoleType) {}
+  public role: RoleType;
+
+  constructor(_role: string) {
+    const newRole = RoleType[_role as keyof typeof RoleType];
+    if (!newRole) throw new InvalidRoleType(_role);
+    this.role = newRole;
+  }
 }
 
 export enum RoleType {
-  Supervisor,
-  User,
-  ServiceOwner,
-  Professional,
+  Supervisor = 'Supervisor',
+  User = 'User',
+  ServiceOwner = 'ServiceOwner',
+  Professional = 'Professional',
 }

@@ -1,6 +1,6 @@
+import { randomUUID } from 'crypto';
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
 import { Role, RoleType } from './role';
-import { uuid } from 'uuidv4';
 
 export interface IDocument {
   type: string;
@@ -13,13 +13,13 @@ export interface VaccineStatus {
 }
 
 export class Profile {
-  public id: string = uuid();
   public services: string[] = [];
   public responsibleForValidation = '';
   public readonly vaccineStatus: VaccineStatus;
   public _role: Role = new Role(RoleType.User);
 
   constructor(
+    public id: string = randomUUID(),
     public name: string,
     public email: string,
     public password: string,
