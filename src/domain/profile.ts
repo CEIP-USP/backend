@@ -16,7 +16,6 @@ export class Profile {
   public services: string[] = [];
   public responsibleForValidation = '';
   public readonly vaccineStatus: VaccineStatus;
-  public _role: Role = new Role(RoleType.User);
 
   constructor(
     public id: string = randomUUID(),
@@ -27,7 +26,8 @@ export class Profile {
     public document: IDocument,
     public phone = '',
     public address = '',
-    public dayOfSecondShot: Date | undefined = undefined
+    public dayOfSecondShot: Date | undefined = undefined,
+    public role: Role = new Role(RoleType.User)
   ) {
     if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
@@ -42,7 +42,7 @@ export class Profile {
     this.vaccineStatus = status;
   }
 
-  public set role(role: Role) {
+  public set _role(role: Role) {
     this.role = role;
   }
 }
