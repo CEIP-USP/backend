@@ -1,5 +1,6 @@
 import { IProfileDataPort } from 'domain/ports/profileDataPort';
 import { Profile } from 'domain/profile';
+import { Role } from 'domain/role';
 import { Collection, Db, Document } from 'mongodb';
 
 const documentToProfile = ({
@@ -12,6 +13,7 @@ const documentToProfile = ({
   phone,
   address,
   dayOfSecondShot,
+  role,
 }: Document) => {
   return new Profile(
     id,
@@ -22,7 +24,8 @@ const documentToProfile = ({
     document,
     phone,
     address,
-    dayOfSecondShot
+    dayOfSecondShot,
+    role
   );
 };
 
@@ -42,10 +45,11 @@ export class ProfileDataAdapter implements IProfileDataPort {
     return documentToProfile(savedProfile as Document);
   };
 
-  findById = async (_id: string): Promise<Profile> => {
+  findById = async (id: string): Promise<Profile> => {
     const profile: Document | null = await this.profileCollection.findOne({
-      _id,
+      id,
     });
+    console.log(profile);
     return documentToProfile(profile as Document);
   };
 }

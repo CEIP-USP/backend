@@ -19,7 +19,7 @@ export class ProfileController {
           ? new Date(req.body.dayOfSecondShot)
           : undefined,
       });
-      res.json(result).status(201);
+      return res.json(result).status(201);
     } catch (e) {
       const exception = e as Error;
       console.error(e);
@@ -34,10 +34,10 @@ export class ProfileController {
   private async updateRole(req: Request, res: Response) {
     try {
       const result = await this.profileUseCases.updateRole(
-        req.body.profileiId,
+        req.params.id,
         new Role(req.body.newRole)
       );
-      res.json(result).status(201);
+      res.json(result).status(200);
     } catch (e) {
       const exception = e as Error;
       console.error(e);
@@ -51,7 +51,7 @@ export class ProfileController {
 
   private mapRoutes() {
     this._router.post('/', this.preRegister.bind(this));
-    this._router.put('/update-role', this.updateRole.bind(this));
+    this._router.put('/:id/role', this.updateRole.bind(this));
   }
 
   public get router(): Router {
