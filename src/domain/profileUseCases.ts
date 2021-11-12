@@ -1,6 +1,7 @@
 import { IProfileDataPort } from './ports/profileDataPort';
 import { Role } from './role';
 import { IDocument, Profile } from './profile';
+import { ObjectId } from 'bson';
 
 export interface PreRegistrationData {
   id: string;
@@ -18,7 +19,6 @@ export default class ProfileUseCases {
   constructor(private readonly profileDataPort: IProfileDataPort) {}
 
   public performPreRegistration({
-    id,
     name,
     email,
     password,
@@ -29,7 +29,7 @@ export default class ProfileUseCases {
     dayOfSecondShot,
   }: PreRegistrationData): Promise<Profile> {
     const profile = new Profile(
-      id,
+      new ObjectId(),
       name,
       email,
       password,
@@ -44,6 +44,7 @@ export default class ProfileUseCases {
 
   public async updateRole(id: string, newRole: Role): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
+    console.log(profile._id);
     profile.role = newRole;
     return this.profileDataPort.save(profile);
   }

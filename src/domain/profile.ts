@@ -1,3 +1,4 @@
+import { ObjectId } from 'bson';
 import { randomUUID } from 'crypto';
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
 import { Role, RoleType } from './role';
@@ -18,7 +19,7 @@ export class Profile {
   public readonly vaccineStatus: VaccineStatus;
 
   constructor(
-    public id: string = randomUUID(),
+    public _id: ObjectId = new ObjectId(),
     public name: string,
     public email: string,
     public password: string,

@@ -1,10 +1,10 @@
 import { IProfileDataPort } from 'domain/ports/profileDataPort';
 import { Profile } from 'domain/profile';
-import { Role } from 'domain/role';
 import { Collection, Db, Document } from 'mongodb';
+import { ObjectId } from 'bson';
 
 const documentToProfile = ({
-  id,
+  _id,
   name,
   email,
   password,
@@ -16,7 +16,7 @@ const documentToProfile = ({
   role,
 }: Document) => {
   return new Profile(
-    id,
+    _id,
     name,
     email,
     password,
@@ -38,6 +38,12 @@ export class ProfileDataAdapter implements IProfileDataPort {
   }
 
   save = async (profile: Profile): Promise<Profile> => {
+    const queriedProfile: Document | null =
+      await this.profileCollection.findOne({
+        _id: profile._id,
+      });
+
+    if (queriedProfile) return this.update(queriedProfile, profile);
     const result = await this.profileCollection.insertOne(profile);
     const savedProfile: Document | null = await this.profileCollection.findOne({
       _id: result.insertedId,
@@ -45,11 +51,24 @@ export class ProfileDataAdapter implements IProfileDataPort {
     return documentToProfile(savedProfile as Document);
   };
 
-  findById = async (id: string): Promise<Profile> => {
+  findById = async (_id: string): Promise<Profile> => {
+    console.log(new ObjectId(_id));
+    console.log(new ObjectId(_id));
     const profile: Document | null = await this.profileCollection.findOne({
-      id,
+      _id: new ObjectId(_id),
     });
-    console.log(profile);
     return documentToProfile(profile as Document);
   };
+
+  private async update(
+    savedProfile: Document,
+    profile: Profile
+  ): Promise<Profile> {
+    const updatedProfile = this.profileCollection.updateOne(
+      { _id: savedProfile._id },
+      { $set: { "role" } }
+    );
+
+    return documentToProfile(updatedProfile as Document);
+  }
 }
