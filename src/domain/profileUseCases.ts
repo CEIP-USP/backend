@@ -37,4 +37,34 @@ export default class ProfileUseCases {
     );
     return this.profileDataPort.save(profile);
   }
+
+  public async updateProfile(
+    id: string,
+    updates: Partial<PreRegistrationData>
+  ): Promise<any> {
+    const profile: Profile | undefined = await this.profileDataPort.findById(
+      id
+    );
+
+    if (!profile) {
+      throw `Profile ${id} not found`;
+    }
+
+    const updated = this._updateProfile(profile, updates);
+
+    await this.profileDataPort.update(updated);
+  }
+
+  // TODO: need improvement
+  // issue: when updates = { bunda: 'suja'}, it'll go to the BD
+  // suggestion: create a DTO class --> this exists in runtime
+  private _updateProfile(
+    original: Profile,
+    updates: Partial<PreRegistrationData>
+  ): any {
+    return {
+      ...original,
+      ...updates,
+    };
+  }
 }
