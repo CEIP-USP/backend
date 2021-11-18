@@ -30,9 +30,9 @@ export class Profile {
     public dayOfSecondShot: Date | undefined = undefined,
     public role: Role = new Role(RoleType.User)
   ) {
-    if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
-      throw new InvalidSecondShotDateError();
-    }
+    // if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
+    //   throw new InvalidSecondShotDateError();
+    // }
 
     const status: VaccineStatus = { vaccinated: hasSecondShot };
 

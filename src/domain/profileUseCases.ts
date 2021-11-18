@@ -44,7 +44,6 @@ export default class ProfileUseCases {
 
   public async updateRole(id: string, newRole: Role): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
-    console.log(profile._id);
     profile.role = newRole;
     return this.profileDataPort.save(profile);
   }
