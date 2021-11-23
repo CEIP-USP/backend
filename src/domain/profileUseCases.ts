@@ -1,11 +1,14 @@
+import { IDocument, Profile } from './profile';
+import { IProfileDataPort } from './ports/profileDataPort';
+import { Role } from './role';
 import {
   TextSearchableQuery,
   TextSearchableQueryParams,
 } from 'common/pagedQuery';
-import { IProfileDataPort } from './ports/profileDataPort';
-import { IDocument, Profile } from './profile';
+import { ObjectId } from 'bson';
 
 export interface PreRegistrationData {
+  id: string;
   name: string;
   email: string;
   password: string;
@@ -30,6 +33,7 @@ export default class ProfileUseCases {
     dayOfSecondShot,
   }: PreRegistrationData): Promise<Profile> {
     const profile = new Profile(
+      new ObjectId(),
       name,
       email,
       password,
@@ -42,9 +46,29 @@ export default class ProfileUseCases {
     return this.profileDataPort.save(profile);
   }
 
+  public async updateRole(id: string, newRole: Role): Promise<Profile> {
+    const profile = await this.profileDataPort.findById(id);
+    profile.role = newRole;
+    return this.profileDataPort.save(profile);
+  }
+
   public findByText(
     params: TextSearchableQueryParams
   ): Promise<TextSearchableQuery<Profile>> {
     return this.profileDataPort.findByText(params);
+  }
+
+  public findByEmail(email: string): Promise<Profile | undefined> {
+    return this.profileDataPort.findByEmail(email);
+  }
+
+  public async verifyCredentials(
+    email: string,
+    password: string
+  ): Promise<Profile | undefined> {
+    const profile = await this.profileDataPort.findByEmail(email);
+    if (!profile) return undefined;
+    if (await profile.verifyPassword(password)) return profile;
+    return undefined;
   }
 }
