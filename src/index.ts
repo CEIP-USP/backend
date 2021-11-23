@@ -1,4 +1,4 @@
-import express, { Application, json } from 'express';
+import express, { Application, json, Request, Response } from 'express';
 import { ProfileController } from './app/controllers/profile.controller';
 import ProfileUseCases from './domain/profileUseCases';
 import cors from 'cors';
@@ -62,6 +62,10 @@ async function main() {
 
     app.listen(process.env.PORT, () => {
       console.log(`Server Running on ${process.env.PORT}!`);
+    });
+
+    app.get('/', (req: Request, res: Response) => {
+      res.status(200).send({ data: 'Hello, world!' });
     });
   } catch (e) {
     console.error(e);
