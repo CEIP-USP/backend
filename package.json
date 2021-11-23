@@ -33,6 +33,7 @@
     "@types/passport-http": "^0.3.9",
     "@types/passport-jwt": "^3.0.6",
     "@types/supertest": "^2.0.11",
+    "@types/uuidv4": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
     "eslint": "^7.32.0",

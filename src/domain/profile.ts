@@ -1,4 +1,6 @@
+import { ObjectId } from 'bson';
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
+import { Role, RoleType } from './role';
 
 export interface IDocument {
   type: string;
@@ -16,6 +18,7 @@ export class Profile {
   public readonly vaccineStatus: VaccineStatus;
 
   constructor(
+    public _id: ObjectId = new ObjectId(),
     public name: string,
     public email: string,
     public password: string,
@@ -23,7 +26,8 @@ export class Profile {
     public document: IDocument,
     public phone = '',
     public address = '',
-    public dayOfSecondShot: Date | undefined = undefined
+    public dayOfSecondShot: Date | undefined = undefined,
+    public role: Role = new Role(RoleType.User)
   ) {
     if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
@@ -36,6 +40,10 @@ export class Profile {
     }
 
     this.vaccineStatus = status;
+  }
+
+  public set _role(role: Role) {
+    this.role = role;
   }
 
   public verifyPassword(password: string): boolean | Promise<boolean> {

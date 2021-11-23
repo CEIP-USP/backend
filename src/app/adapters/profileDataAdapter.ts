@@ -5,8 +5,10 @@ import {
   TextSearchableQuery,
   TextSearchableQueryParams,
 } from '../../common/pagedQuery';
+import { ObjectId } from 'bson';
 
 const documentToProfile = ({
+  _id,
   name,
   email,
   password,
@@ -15,8 +17,10 @@ const documentToProfile = ({
   phone,
   address,
   dayOfSecondShot,
+  role,
 }: Document) => {
   return new Profile(
+    _id,
     name,
     email,
     password,
@@ -24,7 +28,8 @@ const documentToProfile = ({
     document,
     phone,
     address,
-    dayOfSecondShot
+    dayOfSecondShot,
+    role
   );
 };
 
@@ -32,13 +37,23 @@ export class ProfileDataAdapter implements IProfileDataPort {
   private profileCollection: Collection;
 
   constructor(database: Db) {
-    this.profileCollection = database.collection('profiles');
+    this.profileCollection = database.collection(
+      process.env.PROFILE_COLLECTION + ''
+    );
   }
 
   save = async (profile: Profile): Promise<Profile> => {
-    const result = await this.profileCollection.insertOne(profile);
+    const queriedProfile: Document | null =
+      await this.profileCollection.findOne({
+        _id: profile._id,
+      });
+
+    const _id = queriedProfile
+      ? await this.update(queriedProfile, profile)
+      : (await this.profileCollection.insertOne(profile)).insertedId;
+
     const savedProfile: Document | null = await this.profileCollection.findOne({
-      _id: result.insertedId,
+      _id,
     });
     return documentToProfile(savedProfile as Document);
   };
@@ -71,5 +86,26 @@ export class ProfileDataAdapter implements IProfileDataPort {
       },
     });
     return (data && documentToProfile(data)) || undefined;
+  }
+
+  findById = async (_id: string): Promise<Profile> => {
+    const profile: Document | null = await this.profileCollection.findOne({
+      _id: new ObjectId(_id),
+    });
+    return documentToProfile(profile as Document);
+  };
+
+  private async update(
+    savedProfile: Document,
+    profile: Profile
+  ): Promise<ObjectId> {
+    await this.profileCollection.replaceOne(
+      {
+        _id: savedProfile._id,
+      },
+      profile
+    );
+
+    return profile._id;
   }
 }
