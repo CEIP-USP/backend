@@ -2,6 +2,8 @@ import { InvalidRoleType } from 'domain/exceptions/InvalidRoleType';
 import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from 'domain/profileUseCases';
 import { Role } from 'domain/role';
+import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
+import ProfileUseCases from '../../domain/profileUseCases';
 import { Router, Response, Request } from 'express';
 
 export class ProfileController {
