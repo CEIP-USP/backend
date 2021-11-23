@@ -1,4 +1,4 @@
-import express, { Application, json, Request, Response } from 'express';
+import express, { Application, json } from 'express';
 import { ProfileController } from './app/controllers/profile.controller';
 import ProfileUseCases from './domain/profileUseCases';
 import cors from 'cors';
