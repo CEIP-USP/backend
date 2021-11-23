@@ -45,4 +45,8 @@ export class Profile {
   public set _role(role: Role) {
     this.role = role;
   }
+
+  public verifyPassword(password: string): boolean | Promise<boolean> {
+    return this.password === password;
+  }
 }
