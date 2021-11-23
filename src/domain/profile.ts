@@ -1,5 +1,4 @@
 import { ObjectId } from 'bson';
-import { randomUUID } from 'crypto';
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
 import { Role, RoleType } from './role';
 

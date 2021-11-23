@@ -1,16 +1,19 @@
-import { InvalidRoleType } from 'domain/exceptions/InvalidRoleType';
-import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
-import ProfileUseCases from 'domain/profileUseCases';
+import { InvalidRoleType } from '../../domain/exceptions/InvalidRoleType';
 import { Role } from 'domain/role';
 import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from '../../domain/profileUseCases';
-import { Router, Response, Request } from 'express';
+import { Request, Response, Router } from 'express';
 
 export class ProfileController {
-  private _router: Router;
+  private readonly _router: Router;
+
   constructor(protected readonly profileUseCases: ProfileUseCases) {
     this._router = Router();
     this.mapRoutes();
+  }
+
+  public get router(): Router {
+    return this._router;
   }
 
   private async preRegister(req: Request, res: Response) {
@@ -54,9 +57,5 @@ export class ProfileController {
   private mapRoutes() {
     this._router.post('/', this.preRegister.bind(this));
     this._router.put('/:id/role', this.updateRole.bind(this));
-  }
-
-  public get router(): Router {
-    return this._router;
   }
 }
