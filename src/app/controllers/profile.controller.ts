@@ -1,5 +1,5 @@
-import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
-import ProfileUseCases from 'domain/profileUseCases';
+import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
+import ProfileUseCases from '../../domain/profileUseCases';
 import { Router, Response, Request } from 'express';
 
 export class ProfileController {
@@ -29,8 +29,22 @@ export class ProfileController {
     }
   }
 
+  private async update(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const updatedProfile = await this.profileUseCases.updateProfile(
+        id,
+        req.body
+      );
+      res.status(200).json(updatedProfile);
+    } catch (e) {
+      if ((e as string).match('not found')) res.status(404).send();
+    }
+  }
+
   private mapRoutes() {
     this._router.post('/', this.preRegister.bind(this));
+    this._router.put('/:id', this.update.bind(this));
   }
 
   public get router(): Router {

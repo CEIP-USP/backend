@@ -13,7 +13,7 @@ export interface PreRegistrationData {
 }
 
 export default class ProfileUseCases {
-  constructor(private readonly profileDataPort: IProfileDataPort) {}
+  constructor(private readonly profileDataPort: IProfileDataPort) { }
 
   public performPreRegistration({
     name,
@@ -47,12 +47,12 @@ export default class ProfileUseCases {
     );
 
     if (!profile) {
-      throw `Profile ${id} not found`;
+      return Promise.reject(`Profile ${id} not found`);
     }
 
     const updated = this._updateProfile(profile, updates);
 
-    await this.profileDataPort.update(updated);
+    return await this.profileDataPort.update(updated);
   }
 
   // TODO: need improvement

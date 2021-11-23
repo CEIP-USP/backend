@@ -22,7 +22,7 @@ describe(ProfileUseCases, () => {
       id = 'mocked id';
     });
 
-    it('finds the given profile', async () => {
+    it('searches for the given profile', async () => {
       (mockDataPort.findById as jest.Mock).mockResolvedValueOnce(true);
       await usecase.updateProfile(id, { password: '123456' });
       expect(mockDataPort.findById).toHaveBeenCalledWith(id);
@@ -33,7 +33,7 @@ describe(ProfileUseCases, () => {
         (mockDataPort.findById as jest.Mock).mockResolvedValueOnce(undefined);
       });
 
-      it('throws an exception', () => {
+      it('rejects the promise', () => {
         expect(() => usecase.updateProfile('foo', {})).rejects.toMatch(
           'not found'
         );
