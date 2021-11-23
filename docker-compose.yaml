@@ -11,6 +11,8 @@ services:
       - .env
   db:
     image: mongo:4.4.1-bionic
+    ports:
+      - "27017:27017"
     volumes:
       - dbdata:/data/db
 

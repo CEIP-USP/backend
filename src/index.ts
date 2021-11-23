@@ -1,10 +1,4 @@
-import express, { Application, json } from 'express';
-
-import { IProfileDataPort } from 'domain/ports/profileDataPort';
-import { Profile } from 'domain/profile';
-import { ProfileController } from 'controllers/profile.controller';
-import ProfileUseCases from 'domain/profileUseCases';
-import express, { Application, Request, Response, json } from 'express';
+import express, { Application, json, Request, Response } from 'express';
 import { ProfileController } from './app/controllers/profile.controller';
 import ProfileUseCases from './domain/profileUseCases';
 import cors from 'cors';
@@ -13,11 +7,11 @@ import { ProfileDataAdapter } from './app/adapters/profileDataAdapter';
 import { Db } from 'mongodb';
 import cookies from 'cookie-parser';
 import passport from 'passport';
-import { BasicStrategyFactory } from 'auth/strategies/basic.strategy-factory';
-import { AuthController } from 'controllers/auth.controller';
-import { JwtService } from 'auth/services/jwt.service';
-import { RefreshTokenStrategyFactory } from 'auth/strategies/refresh-token.strategy-factory';
-import { AccessTokenStrategyFactory } from 'auth/strategies/access-token.strategy-factory';
+import { BasicStrategyFactory } from './auth/strategies/basic.strategy-factory';
+import { JwtService } from './auth/services/jwt.service';
+import { AccessTokenStrategyFactory } from './auth/strategies/access-token.strategy-factory';
+import { RefreshTokenStrategyFactory } from './auth/strategies/refresh-token.strategy-factory';
+import { AuthController } from './controllers/auth.controller';
 
 const app: Application = express();
 app.use(passport.initialize());
@@ -33,40 +27,38 @@ async function main() {
 
     const profileUseCases = new ProfileUseCases(profileDataAdapter);
 
-    const controller = new ProfileController(profileUseCases);
-  const jwtService = new JwtService();
+    const jwtService = new JwtService();
 
-  const authMiddlewares = {
-    basic: passport.authenticate(
-      await BasicStrategyFactory(
-        profileUseCases.verifyCredentials.bind(profileUseCases)
+    const authMiddlewares = {
+      basic: passport.authenticate(
+        await BasicStrategyFactory(
+          profileUseCases.verifyCredentials.bind(profileUseCases)
+        ),
+        { session: false }
       ),
-      { session: false }
-    ),
-    refreshToken: passport.authenticate(
-      await RefreshTokenStrategyFactory(jwtService, profileUseCases),
-      { session: false }
-    ),
-    accessToken: passport.authenticate(
-      await AccessTokenStrategyFactory(jwtService, profileUseCases),
-      { session: false }
-    ),
-  };
+      refreshToken: passport.authenticate(
+        RefreshTokenStrategyFactory(jwtService, profileUseCases),
+        { session: false }
+      ),
+      accessToken: passport.authenticate(
+        AccessTokenStrategyFactory(jwtService, profileUseCases),
+        { session: false }
+      ),
+    };
 
+    const authController = new AuthController(
+      authMiddlewares.basic,
+      authMiddlewares.refreshToken,
+      jwtService
+    );
+
+    const controller = new ProfileController(
+      profileUseCases,
+      authMiddlewares.accessToken
+    );
+
+    app.use('/auth', authController.router);
     app.use('/profile', controller.router);
-  const authController = new AuthController(
-    authMiddlewares.basic,
-    authMiddlewares.refreshToken,
-    jwtService
-  );
-
-  const controller = new ProfileController(
-    profileUseCases,
-    authMiddlewares.accessToken
-  );
-
-  app.use('/auth', authController.router);
-  app.use('/profile', controller.router);
 
     app.listen(process.env.PORT, () => {
       console.log(`Server Running on ${process.env.PORT}!`);

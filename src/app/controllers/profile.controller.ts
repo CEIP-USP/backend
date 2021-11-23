@@ -1,19 +1,20 @@
-import { TextSearchableQuery } from 'common/pagedQuery';
-import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
-import { Profile } from 'domain/profile';
-import ProfileUseCases from 'domain/profileUseCases';
 import { Request, RequestHandler, Response, Router } from 'express';
 import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from '../../domain/profileUseCases';
 
 export class ProfileController {
-  private _router: Router;
   constructor(
     protected readonly profileUseCases: ProfileUseCases,
     protected readonly accessTokenMiddleware: RequestHandler
   ) {
     this._router = Router();
     this.mapRoutes();
+  }
+
+  private _router: Router;
+
+  public get router(): Router {
+    return this._router;
   }
 
   private async preRegister(req: Request, res: Response) {
@@ -46,12 +47,13 @@ export class ProfileController {
       const skip = parseIntFromQuery(_skip) || 0;
       const take = Math.min(parseIntFromQuery(_take) || 10, 50);
 
-      const result = (await this.profileUseCases.findByText({
-        q,
-        skip,
-        take,
-      })) as TextSearchableQuery<Profile>;
-      res.json(result);
+      res.json(
+        await this.profileUseCases.findByText({
+          q,
+          skip,
+          take,
+        })
+      );
     } catch (e) {
       console.error(e);
       res.status(500).send();
@@ -65,9 +67,5 @@ export class ProfileController {
       this.accessTokenMiddleware,
       this.getProfile.bind(this)
     );
-  }
-
-  public get router(): Router {
-    return this._router;
   }
 }

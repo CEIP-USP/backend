@@ -1,17 +1,26 @@
-import { JwtRefreshCookieService } from 'auth/services/jwt-cookie.service';
-import { JwtService } from 'auth/services/jwt.service';
+import { JwtRefreshCookieService } from '../auth/services/jwt-cookie.service';
+import { JwtService } from '../auth/services/jwt.service';
 import { Profile } from 'domain/profile';
 import { Request, RequestHandler, Response, Router } from 'express';
 
 export class AuthController {
-  private _router = Router();
-
   constructor(
     private readonly basicAuthMiddleware: RequestHandler,
     private readonly refreshTokenMiddleware: RequestHandler,
     private readonly jwtService: JwtService
   ) {
     this.mapRoutes();
+  }
+
+  private _router = Router();
+
+  public get router(): Router {
+    return this._router;
+  }
+
+  private static async logoutRoute(_: Request, res: Response) {
+    JwtRefreshCookieService.remove(res);
+    res.status(200).send();
   }
 
   private async loginRoute(req: Request, res: Response) {
@@ -27,11 +36,6 @@ export class AuthController {
     res.status(201).send();
   }
 
-  private async logoutRoute(_: Request, res: Response) {
-    JwtRefreshCookieService.remove(res);
-    res.status(200).send();
-  }
-
   private mapRoutes() {
     this._router.post(
       '/login',
@@ -43,10 +47,6 @@ export class AuthController {
       this.refreshTokenMiddleware,
       this.refreshRoute.bind(this)
     );
-    this._router.post('/logout', this.logoutRoute.bind(this));
-  }
-
-  public get router(): Router {
-    return this._router;
+    this._router.post('/logout', AuthController.logoutRoute.bind(this));
   }
 }

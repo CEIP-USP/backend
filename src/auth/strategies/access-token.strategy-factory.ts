@@ -1,8 +1,8 @@
 import {
-  JwtService,
   AccessJWTPayload,
+  JwtService,
   TokenTypes,
-} from 'auth/services/jwt.service';
+} from '../services/jwt.service';
 import ProfileUseCases from 'domain/profileUseCases';
 import pJWT, { ExtractJwt } from 'passport-jwt';
 

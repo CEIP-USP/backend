@@ -1,4 +1,4 @@
-import { Profile } from 'domain/profile';
+import { Profile } from '../../domain/profile';
 import { BasicStrategy } from 'passport-http';
 
 export const BasicStrategyFactory: (

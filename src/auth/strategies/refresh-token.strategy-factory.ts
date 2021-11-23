@@ -1,9 +1,9 @@
-import { JwtRefreshCookieService } from 'auth/services/jwt-cookie.service';
+import { JwtRefreshCookieService } from '../services/jwt-cookie.service';
 import {
   JwtService,
   RefreshJWTPayload,
   TokenTypes,
-} from 'auth/services/jwt.service';
+} from '../services/jwt.service';
 import ProfileUseCases from 'domain/profileUseCases';
 import pJWT from 'passport-jwt';
 

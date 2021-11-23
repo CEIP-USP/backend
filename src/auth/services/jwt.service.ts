@@ -1,7 +1,7 @@
-import { Profile } from 'domain/profile';
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwtRefreshCookieService } from './jwt-cookie.service';
+import { Profile } from '../../domain/profile';
 
 export enum TokenTypes {
   Access = 'access',
@@ -24,6 +24,7 @@ export type AccessJWTPayload = {
 
 export interface IJWTService {
   signRefresh(profile: Profile): string;
+
   signAccess(profile: Profile): string;
 }
 
