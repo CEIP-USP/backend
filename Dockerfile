@@ -9,7 +9,7 @@ EXPOSE ${PORT}
 
 COPY package* ./
 
-CMD npm start
+CMD npm dev
 
 RUN npm install
 

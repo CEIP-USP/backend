@@ -4,7 +4,13 @@ import { IProfileDataPort } from 'domain/ports/profileDataPort';
 import { Profile } from 'domain/profile';
 import { ProfileController } from 'controllers/profile.controller';
 import ProfileUseCases from 'domain/profileUseCases';
+import express, { Application, Request, Response, json } from 'express';
+import { ProfileController } from './app/controllers/profile.controller';
+import ProfileUseCases from './domain/profileUseCases';
 import cors from 'cors';
+import setupDb from './app/database';
+import { ProfileDataAdapter } from './app/adapters/profileDataAdapter';
+import { Db } from 'mongodb';
 import cookies from 'cookie-parser';
 import passport from 'passport';
 import { BasicStrategyFactory } from 'auth/strategies/basic.strategy-factory';
@@ -13,44 +19,21 @@ import { JwtService } from 'auth/services/jwt.service';
 import { RefreshTokenStrategyFactory } from 'auth/strategies/refresh-token.strategy-factory';
 import { AccessTokenStrategyFactory } from 'auth/strategies/access-token.strategy-factory';
 
+const app: Application = express();
+app.use(passport.initialize());
+app.use(json());
+app.use(cors({ credentials: true, origin: process.env.CORS }));
+app.use(cookies());
+
 async function main() {
-  const app: Application = express();
-  app.use(passport.initialize());
-  app.use(json());
-  app.use(cors({ credentials: true, origin: process.env.CORS }));
-  app.use(cookies());
+  try {
+    const db = await setupDb();
 
-  const port: IProfileDataPort = {
-    save: async (p) => {
-      console.log('saved ', p);
-      return p;
-    },
-    findByText: async ({ q, skip, take }) => {
-      return {
-        data: [{ name: 'Fulaninho' } as Profile],
-        q,
-        skip,
-        take,
-      };
-    },
-    findByEmail: function (email: string): Promise<Profile | undefined> {
-      return Promise.resolve(
-        new Profile(
-          'Fulano',
-          email,
-          'f',
-          true,
-          { type: 'cpf' },
-          '12345678901',
-          '12345678901',
-          new Date(0)
-        )
-      );
-    },
-  };
+    const profileDataAdapter = new ProfileDataAdapter(db as Db);
 
-  const profileUseCases = new ProfileUseCases(port);
+    const profileUseCases = new ProfileUseCases(profileDataAdapter);
 
+    const controller = new ProfileController(profileUseCases);
   const jwtService = new JwtService();
 
   const authMiddlewares = {
@@ -70,6 +53,7 @@ async function main() {
     ),
   };
 
+    app.use('/profile', controller.router);
   const authController = new AuthController(
     authMiddlewares.basic,
     authMiddlewares.refreshToken,
@@ -84,9 +68,16 @@ async function main() {
   app.use('/auth', authController.router);
   app.use('/profile', controller.router);
 
-  app.listen(process.env.PORT, () => {
-    console.log(`Server Running on ${process.env.PORT}!`);
-  });
+    app.listen(process.env.PORT, () => {
+      console.log(`Server Running on ${process.env.PORT}!`);
+    });
+
+    app.use('/', (req: Request, res: Response) => {
+      res.status(200).send({ data: 'Hello, world!' });
+    });
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 main();
