@@ -1,5 +1,5 @@
 import { InvalidRoleType } from '../../domain/exceptions/InvalidRoleType';
-import { Role } from 'domain/role';
+import { Role } from '../../domain/role';
 import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from '../../domain/profileUseCases';
 import { Request, Response, Router } from 'express';
