@@ -20,14 +20,10 @@ async function main() {
 
     const controller = new ProfileController(profileUseCases);
 
-    app.use('/profile', controller.router);
+    app.use('/profiles', controller.router);
 
     app.listen(process.env.PORT, () => {
       console.log(`Server Running on ${process.env.PORT}!`);
-    });
-
-    app.use('/', (req: Request, res: Response) => {
-      res.status(200).send({ data: 'Hello, world!' });
     });
   } catch (e) {
     console.error(e);
