@@ -1,9 +1,9 @@
 import express, { Application, Request, Response, json } from 'express';
-import { ProfileController } from 'app/controllers/profile.controller';
-import ProfileUseCases from 'domain/profileUseCases';
+import { ProfileController } from './app/controllers/profile.controller';
+import ProfileUseCases from './domain/profileUseCases';
 import cors from 'cors';
-import setupDb from 'app/database';
-import { ProfileDataAdapter } from 'app/adapters/profileDataAdapter';
+import setupDb from './app/database';
+import { ProfileDataAdapter } from './app/adapters/profileDataAdapter';
 import { Db } from 'mongodb';
 
 const app: Application = express();

@@ -1,5 +1,5 @@
-import { InvalidSecondShotDateError } from 'domain/exceptions/InvalidSecondShotDateError';
-import ProfileUseCases from 'domain/profileUseCases';
+import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
+import ProfileUseCases from '../../domain/profileUseCases';
 import { Router, Response, Request } from 'express';
 
 export class ProfileController {

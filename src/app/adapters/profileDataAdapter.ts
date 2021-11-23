@@ -1,5 +1,5 @@
-import { IProfileDataPort } from 'domain/ports/profileDataPort';
-import { Profile } from 'domain/profile';
+import { IProfileDataPort } from '../../domain/ports/profileDataPort';
+import { Profile } from '../../domain/profile';
 import { Collection, Db, Document } from 'mongodb';
 
 const documentToProfile = ({
