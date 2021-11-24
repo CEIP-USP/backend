@@ -5,7 +5,7 @@ import { Request, RequestHandler, Response, Router } from 'express';
 
 export class AuthController {
   constructor(
-    private readonly basicAuthMiddleware: RequestHandler,
+    private readonly localAuthMiddleware: RequestHandler,
     private readonly refreshTokenMiddleware: RequestHandler,
     private readonly jwtService: JwtService
   ) {
@@ -39,11 +39,7 @@ export class AuthController {
   private mapRoutes() {
     this._router.post(
       '/login',
-      this.basicAuthMiddleware,
-      (req, res, next) => {
-        res.removeHeader('www-authenticate');
-        next();
-      },
+      this.localAuthMiddleware,
       this.loginRoute.bind(this)
     );
     this._router.post(
