@@ -40,6 +40,10 @@ export class AuthController {
     this._router.post(
       '/login',
       this.basicAuthMiddleware,
+      (req, res, next) => {
+        res.removeHeader('www-authenticate');
+        next();
+      },
       this.loginRoute.bind(this)
     );
     this._router.post(

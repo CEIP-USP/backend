@@ -1,10 +1,10 @@
 import { Profile } from '../../domain/profile';
-import { BasicStrategy } from 'passport-http';
+import { Strategy as LocalStrategy } from 'passport-local';
 
 export const BasicStrategyFactory: (
   loginFN: (username: string, password: string) => Promise<Profile | undefined>
-) => Promise<BasicStrategy> | BasicStrategy = (loginFN) =>
-  new BasicStrategy((username, password, done) => {
+) => LocalStrategy = (loginFN) =>
+  new LocalStrategy((username: string, password: string, done) => {
     return loginFN(username, password)
       .then((profile) => done(null, profile))
       .catch(done);
