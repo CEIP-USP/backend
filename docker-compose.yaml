@@ -15,6 +15,10 @@ services:
       - ./:/usr/src/app
     env_file:
       - .env
+    command:
+      - "npm"
+      - "run"
+      - "dev"
   db:
     image: mongo:4.4.1-bionic
     ports:
