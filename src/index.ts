@@ -7,7 +7,7 @@ import { ProfileDataAdapter } from './app/adapters/profileDataAdapter';
 import { Db } from 'mongodb';
 import cookies from 'cookie-parser';
 import passport from 'passport';
-import { BasicStrategyFactory } from './auth/strategies/basic.strategy-factory';
+import { LocalStrategyFactory } from './auth/strategies/local.strategy-factory';
 import { JwtService } from './auth/services/jwt.service';
 import { AccessTokenStrategyFactory } from './auth/strategies/access-token.strategy-factory';
 import { RefreshTokenStrategyFactory } from './auth/strategies/refresh-token.strategy-factory';
@@ -30,8 +30,8 @@ async function main() {
     const jwtService = new JwtService();
 
     const authMiddlewares = {
-      basic: passport.authenticate(
-        await BasicStrategyFactory(
+      local: passport.authenticate(
+        LocalStrategyFactory(
           profileUseCases.verifyCredentials.bind(profileUseCases)
         ),
         { session: false }
@@ -47,7 +47,7 @@ async function main() {
     };
 
     const authController = new AuthController(
-      authMiddlewares.basic,
+      authMiddlewares.local,
       authMiddlewares.refreshToken,
       jwtService
     );
