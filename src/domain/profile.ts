@@ -17,6 +17,8 @@ export class Profile {
   public responsibleForValidation = '';
   public readonly vaccineStatus: VaccineStatus;
 
+  private _roles: Role[];
+
   constructor(
     public _id: ObjectId = new ObjectId(),
     public name: string,
@@ -29,6 +31,8 @@ export class Profile {
     public dayOfSecondShot: Date | undefined = undefined,
     public role: Role = new Role(RoleType.User)
   ) {
+    this._roles = [this.role];
+
     if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
       throw new InvalidSecondShotDateError();
     }
@@ -42,8 +46,12 @@ export class Profile {
     this.vaccineStatus = status;
   }
 
-  public set _role(role: Role) {
-    this.role = role;
+  set roles(_roles: Role[]) {
+    this._roles = _roles;
+  }
+
+  get roles(): Role[] {
+    return this._roles;
   }
 
   public verifyPassword(password: string): boolean | Promise<boolean> {
