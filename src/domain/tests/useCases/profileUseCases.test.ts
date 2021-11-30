@@ -1,3 +1,4 @@
+import { isRegExp } from 'util/types';
 import { IProfileDataPort } from '../../ports/profileDataPort';
 import ProfileUseCases from '../../profileUseCases';
 import { Role } from '../../role';
@@ -11,17 +12,17 @@ describe(ProfileUseCases, () => {
     findByText: jest.fn(),
   };
   const profileUseCases = new ProfileUseCases(profileDataPort);
+  describe('update roles', () => {
+    it('should add a role to profile', async () => {
+      const id = '1234-5678';
+      const role = new Role('Supervisor');
+      const expected = profileMock();
+      expected.roles.push(role);
+      (profileDataPort.save as jest.Mock).mockResolvedValueOnce(expected);
 
-  it('should add a role to profile', async () => {
-    const id = '1234-5678';
-    const role = new Role('Supervisor');
-    const expected = profileMock();
-    expected.roles.push(role);
+      const profile = await profileUseCases.addRole(id, role);
 
-    (profileDataPort.save as jest.Mock).mockResolvedValueOnce(expected);
-
-    const profile = await profileUseCases.addRole(id, role);
-
-    expect(profile.roles).toEqual([new Role('User'), new Role('Supervisor')]);
+      expect(profile.roles).toEqual([new Role('User'), new Role('Supervisor')]);
+    });
   });
 });
