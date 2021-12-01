@@ -2,7 +2,7 @@ import { Profile } from '../profile';
 import { InvalidSecondShotDateError } from '../exceptions/InvalidSecondShotDateError';
 
 describe('Profile', () => {
-  describe('day of second shot validation', () => {
+  describe('Day of second shot validation', () => {
     const instantiateProfile = (date: Date) =>
       new Profile(
         'John Doe',

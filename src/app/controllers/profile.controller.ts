@@ -3,6 +3,9 @@ import { InvalidRoleType } from '../../domain/exceptions/InvalidRoleType';
 import { Role } from '../../domain/role';
 import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from '../../domain/profileUseCases';
+import { ValidationError } from 'joi';
+import { EmailAlreadyRegisteredError } from '../../domain/exceptions/EmailAlreadyRegisteredError';
+import { DocumentAlreadyRegisteredError } from '../../domain/exceptions/DocumentAlreadyRegisteredError';
 
 export class ProfileController {
   private readonly _router: Router;
@@ -31,7 +34,19 @@ export class ProfileController {
     } catch (e) {
       const exception = e as Error;
       console.error(e);
-      if (exception instanceof InvalidSecondShotDateError) {
+      if (exception instanceof ValidationError) {
+        res.status(400).json(exception.details);
+      } else if (exception instanceof EmailAlreadyRegisteredError) {
+        res.status(409).json({
+          message: exception.message,
+          path: ['email'],
+        });
+      } else if (exception instanceof DocumentAlreadyRegisteredError) {
+        res.status(409).json({
+          message: exception.message,
+          path: ['document'],
+        });
+      } else if (exception instanceof InvalidSecondShotDateError) {
         res.status(422).send();
       } else {
         res.status(500).send();

@@ -1,5 +1,5 @@
 import { IProfileDataPort } from '../../domain/ports/profileDataPort';
-import { Profile } from '../../domain/profile';
+import { IDocument, Profile } from '../../domain/profile';
 import { Collection, Db, Document } from 'mongodb';
 import {
   TextSearchableQuery,
@@ -20,7 +20,6 @@ const documentToProfile = ({
   role,
 }: Document) => {
   return new Profile(
-    _id,
     name,
     email,
     password,
@@ -29,7 +28,8 @@ const documentToProfile = ({
     phone,
     address,
     dayOfSecondShot,
-    role
+    role,
+    _id
   );
 };
 
@@ -40,6 +40,19 @@ export class ProfileDataAdapter implements IProfileDataPort {
     this.profileCollection = database.collection(
       process.env.PROFILE_COLLECTION + ''
     );
+  }
+
+  findByDocument(document: IDocument): Promise<Profile | undefined> {
+    return this.profileCollection
+      .findOne({
+        document: {
+          type: document.type,
+          value: document.value,
+        },
+      })
+      .then(
+        (profile) => (!!profile && documentToProfile(profile)) || undefined
+      );
   }
 
   save = async (profile: Profile): Promise<Profile> => {
