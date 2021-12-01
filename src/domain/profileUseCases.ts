@@ -33,7 +33,6 @@ export default class ProfileUseCases {
     dayOfSecondShot,
   }: PreRegistrationData): Promise<Profile> {
     const profile = new Profile(
-      new ObjectId(),
       name,
       email,
       password,
@@ -41,7 +40,9 @@ export default class ProfileUseCases {
       document,
       phone,
       address,
-      dayOfSecondShot
+      dayOfSecondShot,
+      undefined,
+      new ObjectId()
     );
     return this.profileDataPort.save(profile);
   }
