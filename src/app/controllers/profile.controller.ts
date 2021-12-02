@@ -60,7 +60,7 @@ export class ProfileController {
 
       const parseIntFromQuery = (value: any) => !!value && parseInt(value);
 
-      const q = _q + '';
+      const q = _q ? _q.toString() : '';
       const skip = parseIntFromQuery(_skip) || 0;
       const take = Math.min(parseIntFromQuery(_take) || 10, 50);
 

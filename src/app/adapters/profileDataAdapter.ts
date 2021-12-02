@@ -74,15 +74,12 @@ export class ProfileDataAdapter implements IProfileDataPort {
   async findByText(
     params: TextSearchableQueryParams
   ): Promise<TextSearchableQuery<Profile>> {
+    const textParam = params.q.trim();
+    const filter: any = {};
+    if (textParam) filter['$text'] = { $search: textParam };
+
     const result = await this.profileCollection
-      .find(
-        {
-          name: {
-            $regex: params.q,
-          },
-        },
-        { skip: params.skip, limit: params.take }
-      )
+      .find(filter, { skip: params.skip, limit: params.take })
       .map(documentToProfile)
       .toArray();
 
