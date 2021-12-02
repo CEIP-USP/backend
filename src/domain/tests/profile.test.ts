@@ -4,7 +4,7 @@ import { InvalidSecondShotDateError } from '../exceptions/InvalidSecondShotDateE
 describe('Profile', () => {
   describe('Day of second shot validation', () => {
     const instantiateProfile = (date: Date) =>
-      new Profile(
+      Profile.create(
         'John Doe',
         'john.doe@gmail.com',
         '@BlaBlaBla123',
@@ -13,24 +13,23 @@ describe('Profile', () => {
         '12345678900',
         'Rua Bla Bla, 123',
         date,
-        undefined,
         undefined
       );
 
-    test('true negative', () => {
+    test('true negative', async () => {
       const futureDate = new Date(
         new Date().getTime() + 1000 * 60 * 60 * 24 * 21
       );
-      expect(() => instantiateProfile(futureDate)).toThrowError(
+      await expect(() => instantiateProfile(futureDate)).rejects.toThrowError(
         InvalidSecondShotDateError
       );
     });
 
-    test('true positive', () => {
+    test('true positive', async () => {
       const pastDate = new Date(
         new Date().getTime() - 1000 * 60 * 60 * 24 * 21
       );
-      expect(() => instantiateProfile(pastDate)).not.toThrow();
+      await expect(() => instantiateProfile(pastDate)).resolves;
     });
   });
 });

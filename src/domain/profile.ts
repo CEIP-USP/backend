@@ -1,4 +1,5 @@
 import { ObjectId } from 'bson';
+import bcrypt from 'bcryptjs';
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
 import { Role, RoleType } from './role';
 
@@ -45,13 +46,41 @@ export class Profile {
     this.role = role;
   }
 
+  static async create(
+    name: string,
+    email: string,
+    password: string,
+    hasSecondShot: boolean,
+    document: IDocument,
+    phone = '',
+    address = '',
+    dayOfSecondShot: Date | undefined = undefined,
+    role: Role = new Role(RoleType.User)
+  ): Promise<Profile> {
+    return new Profile(
+      name,
+      email,
+      await Profile.hashPassword(password),
+      hasSecondShot,
+      document,
+      phone,
+      address,
+      dayOfSecondShot,
+      role
+    );
+  }
+
   static validateDayOfSecondShot(date?: Date): boolean {
     if (!date || isNaN(date.getTime())) return false;
     const now = new Date();
     return now.getTime() > date.getTime();
   }
 
+  private static async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, await bcrypt.genSalt(10));
+  }
+
   public verifyPassword(password: string): boolean | Promise<boolean> {
-    return this.password === password;
+    return bcrypt.compare(password, this.password);
   }
 }

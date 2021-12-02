@@ -6,7 +6,6 @@ import {
   TextSearchableQueryParams,
 } from 'common/pagedQuery';
 import joi from 'joi';
-import { ObjectId } from 'bson';
 import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
 
@@ -70,7 +69,7 @@ export default class ProfileUseCases {
       throw new DocumentAlreadyRegisteredError(document);
     }
 
-    const profile = new Profile(
+    const profile = await Profile.create(
       name,
       email,
       password,
@@ -78,9 +77,7 @@ export default class ProfileUseCases {
       document,
       phone,
       address,
-      dayOfSecondShot,
-      undefined,
-      new ObjectId()
+      dayOfSecondShot
     );
     return this.profileDataPort.save(profile);
   }
