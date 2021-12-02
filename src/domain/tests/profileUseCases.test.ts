@@ -4,11 +4,12 @@ import ProfileUseCases from '../profileUseCases';
 import { EmailAlreadyRegisteredError } from '../exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from '../exceptions/DocumentAlreadyRegisteredError';
 import { ValidationError } from 'joi';
+import crypto from 'crypto';
 
 describe('ProfileUseCases', () => {
   describe('performPreRegistration', () => {
     const sampleData = {
-      password: 'uoiAZPNUHsHTMX3*YU3c8Fg',
+      password: crypto.randomBytes(10).toString('hex'),
       name: 'John Doe',
       email: 'john.doe123@gmail.com',
       document: {
