@@ -38,7 +38,7 @@ const preRegistrationSchema = joi.object({
 });
 
 export default class ProfileUseCases {
-  constructor(private readonly profileDataPort: IProfileDataPort) {}
+  constructor(private readonly profileDataPort: IProfileDataPort) { }
 
   public async performPreRegistration({
     name,
@@ -89,6 +89,14 @@ export default class ProfileUseCases {
     const profile = await this.profileDataPort.findById(id);
     profile.roles.push(newRole);
     return this.profileDataPort.save(profile);
+  }
+
+  public async removeRole(id: string, roleName: string): Promise<any> {
+    const profile = await this.profileDataPort.findById(id);
+    profile.roles = profile.roles.filter(
+      (role: Role) => role.name !== roleName
+    );
+    return await this.profileDataPort.save(profile);
   }
 
   public findByText(

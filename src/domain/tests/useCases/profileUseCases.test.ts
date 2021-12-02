@@ -9,19 +9,44 @@ describe(ProfileUseCases, () => {
     save: jest.fn(),
     findByEmail: jest.fn(),
     findByText: jest.fn(),
+    findByDocument: jest.fn(),
   };
   const profileUseCases = new ProfileUseCases(profileDataPort);
 
-  it('should add a role to profile', async () => {
-    const id = '1234-5678';
-    const role = new Role('Supervisor');
-    const expected = profileMock();
-    expected.roles.push(role);
+  beforeEach(() => {
+    (profileDataPort.save as jest.Mock).mockReset();
+  });
 
-    (profileDataPort.save as jest.Mock).mockResolvedValueOnce(expected);
+  describe('add roles', () => {
+    it('should add a role to profile', async () => {
+      const id = '1234-5678';
+      const role = new Role('Supervisor');
+      const expected = profileMock();
 
-    const profile = await profileUseCases.addRole(id, role);
+      (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(expected);
 
-    expect(profile.roles).toEqual([new Role('User'), new Role('Supervisor')]);
+      await profileUseCases.addRole(id, role);
+
+      expect(
+        (profileDataPort.save as jest.Mock).mock.calls[0][0].roles
+      ).toEqual([new Role('User'), role]);
+    });
+  });
+
+  describe('remove role', () => {
+    it('should remove a role from profile', async () => {
+      const id = '1234-5678';
+      const roleName = 'Supervisor';
+      const expected = profileMock();
+      expected.roles.push(new Role(roleName));
+
+      (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(expected);
+
+      await profileUseCases.removeRole(id, roleName);
+
+      expect(
+        (profileDataPort.save as jest.Mock).mock.calls[0][0].roles
+      ).toEqual([new Role('User')]);
+    });
   });
 });
