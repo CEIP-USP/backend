@@ -77,6 +77,28 @@ export class ProfileController {
     }
   }
 
+  private async getProfileByID(req: Request, res: Response) {
+    try {
+      const id = req.params.id + '';
+      const profile = await this.profileUseCases.findById(id);
+      if (profile)
+        res.status(200).json({
+          name: profile.name,
+          email: profile.email,
+          document: profile.document,
+          phone: profile.phone,
+          adress: profile.address,
+          dayOfSecondShot: profile.dayOfSecondShot?.toISOString(),
+          role: profile.role,
+          _id: profile._id,
+        });
+      else res.status(404).send();
+    } catch (err) {
+      console.error(err);
+      res.status(500).send();
+    }
+  }
+
   private async removeRole(req: Request, res: Response) {
     try {
       const profile = await this.profileUseCases.removeRole(
@@ -122,5 +144,15 @@ export class ProfileController {
     );
     this._router.put('/:id/role', this.addRole.bind(this));
     this._router.delete('/:id/role/:roleName', this.removeRole.bind(this));
+    this._router.put(
+      '/:id/role',
+      this.accessTokenMiddleware,
+      this.updateRole.bind(this)
+    );
+    this._router.get(
+      '/:id',
+      this.accessTokenMiddleware,
+      this.getProfileByID.bind(this)
+    );
   }
 }

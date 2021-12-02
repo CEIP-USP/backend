@@ -9,6 +9,7 @@ import joi from 'joi';
 import { ObjectId } from 'bson';
 import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
+import { ProfileNotFoundError } from './exceptions/ProfileNotFoundError';
 
 export interface PreRegistrationData {
   name: string;
@@ -87,16 +88,24 @@ export default class ProfileUseCases {
 
   public async addRole(id: string, newRole: Role): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
     profile.roles.push(newRole);
     return this.profileDataPort.save(profile);
   }
 
   public async removeRole(id: string, roleName: string): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
     profile.roles = profile.roles.filter(
       (role: Role) => role.name !== roleName
     );
     return await this.profileDataPort.save(profile);
+  }
+
+  public findById(id: string): Promise<Profile | undefined> {
+    return this.profileDataPort.findById(id);
   }
 
   public findByText(
