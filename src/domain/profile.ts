@@ -18,7 +18,6 @@ export class Profile {
   public readonly vaccineStatus: VaccineStatus;
 
   constructor(
-    public _id: ObjectId = new ObjectId(),
     public name: string,
     public email: string,
     public password: string,
@@ -27,11 +26,11 @@ export class Profile {
     public phone = '',
     public address = '',
     public dayOfSecondShot: Date | undefined = undefined,
-    public role: Role = new Role(RoleType.User)
+    public role: Role = new Role(RoleType.User),
+    public _id: ObjectId = new ObjectId()
   ) {
-    if (!dayOfSecondShot || dayOfSecondShot.getTime() > Date.now()) {
+    if (!Profile.validateDayOfSecondShot(dayOfSecondShot))
       throw new InvalidSecondShotDateError();
-    }
 
     const status: VaccineStatus = { vaccinated: hasSecondShot };
 
@@ -44,6 +43,12 @@ export class Profile {
 
   public set _role(role: Role) {
     this.role = role;
+  }
+
+  static validateDayOfSecondShot(date?: Date): boolean {
+    if (!date || isNaN(date.getTime())) return false;
+    const now = new Date();
+    return now.getTime() > date.getTime();
   }
 
   public verifyPassword(password: string): boolean | Promise<boolean> {
