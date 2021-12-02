@@ -1,5 +1,4 @@
 import { IProfileDataPort } from '../ports/profileDataPort';
-import { Profile } from '../profile';
 import ProfileUseCases from '../profileUseCases';
 import { EmailAlreadyRegisteredError } from '../exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from '../exceptions/DocumentAlreadyRegisteredError';
@@ -22,36 +21,20 @@ describe('ProfileUseCases', () => {
       hasSecondShot: true,
     };
 
-    let store: Profile[] = [];
-    const port: IProfileDataPort = {
-      save: jest.fn(async (profile) => {
-        store.push(profile);
-        return profile;
-      }) as any,
-      findByDocument: jest.fn(async (document) => {
-        return store.find(
-          (p) =>
-            p.document.value === document.value &&
-            p.document.type === document.type
-        );
-      }) as any,
-      findByEmail: jest.fn(async (email) => {
-        return store.find((p) => p.email === email);
-      }) as any,
-    } as IProfileDataPort;
+    const port = {
+      save: jest.fn().mockImplementation((x) => x),
+      findByDocument: jest.fn().mockResolvedValueOnce(undefined),
+      findByEmail: jest.fn().mockResolvedValueOnce(undefined),
+    };
 
     beforeEach(() => {
-      store = [];
-      // @ts-ignore
       port.save.mockClear();
-      // @ts-ignore
       port.findByDocument.mockClear();
-      // @ts-ignore
       port.findByEmail.mockClear();
     });
 
     test('true positive', async () => {
-      const useCases = new ProfileUseCases(port);
+      const useCases = new ProfileUseCases(port as unknown as IProfileDataPort);
       const result = await useCases.performPreRegistration(sampleData);
 
       expect(result.email).toBe(sampleData.email);
@@ -68,11 +51,9 @@ describe('ProfileUseCases', () => {
     });
 
     test('true negative (email)', async () => {
-      store.push({
-        email: sampleData.email,
-      } as Profile);
-      const useCases = new ProfileUseCases(port);
+      const useCases = new ProfileUseCases(port as unknown as IProfileDataPort);
 
+      await port.findByEmail.mockResolvedValueOnce({});
       await expect(() =>
         useCases.performPreRegistration(sampleData)
       ).rejects.toThrowError(EmailAlreadyRegisteredError);
@@ -83,14 +64,8 @@ describe('ProfileUseCases', () => {
     });
 
     test('true negative (document)', async () => {
-      store.push({
-        email: sampleData.email + '.other',
-        document: {
-          value: sampleData.document.value,
-          type: sampleData.document.type,
-        },
-      } as Profile);
-      const useCases = new ProfileUseCases(port);
+      const useCases = new ProfileUseCases(port as unknown as IProfileDataPort);
+      port.findByDocument.mockResolvedValueOnce({});
 
       await expect(() =>
         useCases.performPreRegistration(sampleData)
@@ -102,7 +77,7 @@ describe('ProfileUseCases', () => {
     });
 
     test('true negative (weak password)', async () => {
-      const useCases = new ProfileUseCases(port);
+      const useCases = new ProfileUseCases(port as unknown as IProfileDataPort);
 
       await expect(() =>
         useCases.performPreRegistration({ ...sampleData, password: '123' })

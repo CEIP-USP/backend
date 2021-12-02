@@ -42,17 +42,15 @@ export class ProfileDataAdapter implements IProfileDataPort {
     );
   }
 
-  findByDocument(document: IDocument): Promise<Profile | undefined> {
-    return this.profileCollection
-      .findOne({
-        document: {
-          type: document.type,
-          value: document.value,
-        },
-      })
-      .then(
-        (profile) => (!!profile && documentToProfile(profile)) || undefined
-      );
+  async findByDocument(document: IDocument): Promise<Profile | undefined> {
+    const result = await this.profileCollection.findOne({
+      document: {
+        type: document.type,
+        value: document.value,
+      },
+    });
+    if (!result) return undefined;
+    return documentToProfile(result);
   }
 
   save = async (profile: Profile): Promise<Profile> => {
