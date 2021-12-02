@@ -83,4 +83,8 @@ export class Profile {
   public verifyPassword(password: string): boolean | Promise<boolean> {
     return bcrypt.compare(password, this.password);
   }
+
+  public async setPassword(password: string): Promise<void> {
+    this.password = await Profile.hashPassword(password);
+  }
 }

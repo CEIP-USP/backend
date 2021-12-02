@@ -107,4 +107,14 @@ export default class ProfileUseCases {
     if (await profile.verifyPassword(password)) return profile;
     return undefined;
   }
+
+  public async updatePassword(
+    id: string,
+    newPassword: string
+  ): Promise<Profile> {
+    const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new Error('Profile not found');
+    await profile.setPassword(newPassword);
+    return this.profileDataPort.save(profile);
+  }
 }

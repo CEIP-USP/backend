@@ -54,7 +54,8 @@ async function main() {
 
     const controller = new ProfileController(
       profileUseCases,
-      authMiddlewares.accessToken
+      authMiddlewares.accessToken,
+      authMiddlewares.local
     );
 
     app.use('/auth', authController.router);
