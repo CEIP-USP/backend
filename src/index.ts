@@ -7,11 +7,11 @@ import { ProfileDataAdapter } from './app/adapters/profileDataAdapter';
 import { Db } from 'mongodb';
 import cookies from 'cookie-parser';
 import passport from 'passport';
-import { LocalStrategyFactory } from './auth/strategies/local.strategy-factory';
-import { JwtService } from './auth/services/jwt.service';
-import { AccessTokenStrategyFactory } from './auth/strategies/access-token.strategy-factory';
-import { RefreshTokenStrategyFactory } from './auth/strategies/refresh-token.strategy-factory';
-import { AuthController } from './controllers/auth.controller';
+import { LocalStrategyFactory } from './app/auth/strategies/local.strategy-factory';
+import { JwtService } from './app/auth/services/jwt.service';
+import { AccessTokenStrategyFactory } from './app/auth/strategies/access-token.strategy-factory';
+import { RefreshTokenStrategyFactory } from './app/auth/strategies/refresh-token.strategy-factory';
+import { AuthController } from './app/controllers/auth.controller';
 
 const app: Application = express();
 app.use(passport.initialize());

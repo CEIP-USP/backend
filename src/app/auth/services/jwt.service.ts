@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwtRefreshCookieService } from './jwt-cookie.service';
-import { Profile } from '../../domain/profile';
-import { RoleType } from '../../domain/role';
+import { Profile } from '../../../domain/profile';
+import { RoleType } from '../../../domain/role';
 
 export enum TokenTypes {
   Access = 'access',
