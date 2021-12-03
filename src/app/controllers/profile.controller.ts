@@ -1,6 +1,4 @@
 import { Request, RequestHandler, Response, Router } from 'express';
-import { InvalidRoleType } from '../../domain/exceptions/InvalidRoleType';
-import { Role } from '../../domain/role';
 import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from '../../domain/profileUseCases';
 import { ValidationError } from 'joi';
@@ -77,21 +75,25 @@ export class ProfileController {
     }
   }
 
-  private async updateRole(req: Request, res: Response) {
+  private async getProfileByID(req: Request, res: Response) {
     try {
-      const result = await this.profileUseCases.updateRole(
-        req.params.id,
-        new Role(req.body.newRole)
-      );
-      res.json(result).status(200);
-    } catch (e) {
-      const exception = e as Error;
-      console.error(e);
-      if (exception instanceof InvalidRoleType) {
-        res.status(422).send();
-      } else {
-        res.status(500).send();
-      }
+      const id = req.params.id + '';
+      const profile = await this.profileUseCases.findById(id);
+      if (profile)
+        res.status(200).json({
+          name: profile.name,
+          email: profile.email,
+          document: profile.document,
+          phone: profile.phone,
+          adress: profile.address,
+          dayOfSecondShot: profile.dayOfSecondShot?.toISOString(),
+          role: profile.role,
+          _id: profile._id,
+        });
+      else res.status(404).send();
+    } catch (err) {
+      console.error(err);
+      res.status(500).send();
     }
   }
 
@@ -102,6 +104,10 @@ export class ProfileController {
       this.accessTokenMiddleware,
       this.getProfile.bind(this)
     );
-    this._router.put('/:id/role', this.updateRole.bind(this));
+    this._router.get(
+      '/:id',
+      this.accessTokenMiddleware,
+      this.getProfileByID.bind(this)
+    );
   }
 }

@@ -96,11 +96,19 @@ export class ProfileDataAdapter implements IProfileDataPort {
     return (data && documentToProfile(data)) || undefined;
   }
 
-  findById = async (_id: string): Promise<Profile> => {
+  findById = async (_id: string): Promise<Profile | undefined> => {
+    let idObject: ObjectId;
+    try {
+      idObject = new ObjectId(_id);
+    } catch (e) {
+      return undefined;
+    }
+
     const profile: Document | null = await this.profileCollection.findOne({
-      _id: new ObjectId(_id),
+      _id: idObject,
     });
-    return documentToProfile(profile as Document);
+    if (!profile) return undefined;
+    return documentToProfile(profile);
   };
 
   private async update(
