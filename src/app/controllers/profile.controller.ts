@@ -4,13 +4,15 @@ import ProfileUseCases from '../../domain/profileUseCases';
 import { ValidationError } from 'joi';
 import { EmailAlreadyRegisteredError } from '../../domain/exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from '../../domain/exceptions/DocumentAlreadyRegisteredError';
+import { Profile } from '../../domain/profile';
 
 export class ProfileController {
   private readonly _router: Router;
 
   constructor(
     protected readonly profileUseCases: ProfileUseCases,
-    protected readonly accessTokenMiddleware: RequestHandler
+    protected readonly accessTokenMiddleware: RequestHandler,
+    protected readonly usernamePasswordMiddleware: RequestHandler
   ) {
     this._router = Router();
     this.mapRoutes();
@@ -97,7 +99,29 @@ export class ProfileController {
     }
   }
 
+  private async updatePassword(req: Request, res: Response) {
+    try {
+      const profile = req.user as Profile;
+      if (profile._id.toString() !== req.params.id)
+        return res.status(403).send();
+
+      const result = await this.profileUseCases.updatePassword(
+        profile._id + '',
+        req.body.newPassword + ''
+      );
+      res.json(result).status(200);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send();
+    }
+  }
+
   private mapRoutes() {
+    this._router.put(
+      '/:id/password',
+      this.usernamePasswordMiddleware,
+      this.updatePassword.bind(this)
+    );
     this._router.post('/', this.preRegister.bind(this));
     this._router.get(
       '/',
