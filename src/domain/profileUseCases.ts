@@ -91,7 +91,7 @@ export default class ProfileUseCases {
     return this.profileDataPort.save(profile);
   }
 
-  public async removeRole(id: string, roleName: string): Promise<any> {
+  public async removeRole(id: string, roleName: string): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
     profile.roles = profile.roles.filter(
       (role: Role) => role.name !== roleName

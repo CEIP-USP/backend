@@ -79,11 +79,11 @@ export class ProfileController {
 
   private async removeRole(req: Request, res: Response) {
     try {
-      const result = await this.profileUseCases.removeRole(
+      const profile = await this.profileUseCases.removeRole(
         req.params.id,
         req.params.roleName
       );
-      res.json(result).status(200);
+      res.json(profile).status(200);
     } catch (e) {
       const exception = e as Error;
       console.error(e);
@@ -97,11 +97,11 @@ export class ProfileController {
 
   private async addRole(req: Request, res: Response) {
     try {
-      const result = await this.profileUseCases.addRole(
+      const profile = await this.profileUseCases.addRole(
         req.params.id,
         new Role(req.body.newRole)
       );
-      res.json(result).status(200);
+      res.json(profile).status(200);
     } catch (e) {
       const exception = e as Error;
       console.error(e);
