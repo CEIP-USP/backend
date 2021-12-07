@@ -11,8 +11,10 @@ export class Role {
 }
 
 export enum RoleType {
-  Supervisor = 'Supervisor',
-  User = 'User',
-  ServiceOwner = 'ServiceOwner',
-  Professional = 'Professional',
+  Usuario = 'Usuario',
+  ControladorDeAcesso = 'ControladorDeAcesso',
+  Atendente = 'Atendente',
+  ResponsavelPorAtendente = 'ResponsavelPorAtendente',
+  CoordenacaoDeServico = 'CoordenacaoDeServico',
+  GestaoDeServico = 'GestaoDeServico',
 }

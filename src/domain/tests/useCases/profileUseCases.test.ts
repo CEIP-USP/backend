@@ -24,7 +24,7 @@ describe(ProfileUseCases, () => {
   describe('add roles', () => {
     it('should add a role to profile', async () => {
       const id = '1234-5678';
-      const role = new Role('Supervisor');
+      const role = new Role('Atendente');
       const expected = profileMock();
 
       (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(expected);
@@ -33,14 +33,14 @@ describe(ProfileUseCases, () => {
 
       expect(
         (profileDataPort.save as jest.Mock).mock.calls[0][0].roles
-      ).toEqual([new Role('User'), role]);
+      ).toEqual([new Role('Usuario'), role]);
     });
   });
 
   describe('remove role', () => {
     it('should remove a role from profile', async () => {
       const id = '1234-5678';
-      const roleName = 'Supervisor';
+      const roleName = 'Atendente';
       const expected = profileMock();
       expected.roles.push(new Role(roleName));
 
@@ -50,7 +50,7 @@ describe(ProfileUseCases, () => {
 
       expect(
         (profileDataPort.save as jest.Mock).mock.calls[0][0].roles
-      ).toEqual([new Role('User')]);
+      ).toEqual([new Role('Usuario')]);
     });
   });
 

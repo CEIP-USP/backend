@@ -1,3 +1,4 @@
+import { Role } from '../../role';
 import { Profile } from '../../profile';
 
 const profileMock = (): Profile =>
@@ -12,7 +13,8 @@ const profileMock = (): Profile =>
     },
     undefined,
     undefined,
-    new Date(2021, 1, 31)
+    new Date(2021, 1, 31),
+    [new Role('Usuario')]
   );
 
 export default profileMock;

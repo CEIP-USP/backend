@@ -29,7 +29,7 @@ export class Profile {
     public phone = '',
     public address = '',
     public dayOfSecondShot: Date | undefined = undefined,
-    _roles: Role[] = [new Role(RoleType.User)],
+    _roles: Role[] = [new Role(RoleType.Usuario)],
     public _id: ObjectId = new ObjectId()
   ) {
     if (!Profile.validateDayOfSecondShot(dayOfSecondShot))
@@ -55,7 +55,7 @@ export class Profile {
     phone = '',
     address = '',
     dayOfSecondShot: Date | undefined = undefined,
-    roles: Role[] = [new Role(RoleType.User)]
+    roles: Role[] = []
   ): Promise<Profile> {
     return new Profile(
       name,
