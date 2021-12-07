@@ -2,7 +2,6 @@ import { Profile } from '../../profile';
 
 const profileMock = (): Profile =>
   new Profile(
-    undefined,
     'Susan',
     'pearline_hin@hotmail.com',
     '1234',

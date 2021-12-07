@@ -1,4 +1,4 @@
-import { Profile } from '../domain/profile';
+import { Profile } from '../../domain/profile';
 
 declare global {
   namespace Express {

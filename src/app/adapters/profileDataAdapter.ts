@@ -1,5 +1,5 @@
 import { IProfileDataPort } from '../../domain/ports/profileDataPort';
-import { Profile } from '../../domain/profile';
+import { IDocument, Profile } from '../../domain/profile';
 import { Collection, Db, Document } from 'mongodb';
 import {
   TextSearchableQuery,
@@ -20,7 +20,6 @@ const documentToProfile = ({
   role,
 }: Document) => {
   return new Profile(
-    _id,
     name,
     email,
     password,
@@ -29,7 +28,8 @@ const documentToProfile = ({
     phone,
     address,
     dayOfSecondShot,
-    role
+    role,
+    _id
   );
 };
 
@@ -40,6 +40,17 @@ export class ProfileDataAdapter implements IProfileDataPort {
     this.profileCollection = database.collection(
       process.env.PROFILE_COLLECTION + ''
     );
+  }
+
+  async findByDocument(document: IDocument): Promise<Profile | undefined> {
+    const result = await this.profileCollection.findOne({
+      document: {
+        type: document.type,
+        value: document.value,
+      },
+    });
+    if (!result) return undefined;
+    return documentToProfile(result);
   }
 
   save = async (profile: Profile): Promise<Profile> => {
@@ -61,15 +72,12 @@ export class ProfileDataAdapter implements IProfileDataPort {
   async findByText(
     params: TextSearchableQueryParams
   ): Promise<TextSearchableQuery<Profile>> {
+    const textParam = params.q.trim();
+    const filter: any = {};
+    if (textParam) filter['$text'] = { $search: textParam };
+
     const result = await this.profileCollection
-      .find(
-        {
-          name: {
-            $regex: params.q,
-          },
-        },
-        { skip: params.skip, limit: params.take }
-      )
+      .find(filter, { skip: params.skip, limit: params.take })
       .map(documentToProfile)
       .toArray();
 

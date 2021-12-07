@@ -3,7 +3,7 @@ import {
   TextSearchableQueryParams,
 } from 'common/pagedQuery';
 
-import { Profile } from '../profile';
+import { IDocument, Profile } from '../profile';
 
 export interface IProfileDataPort {
   findById: (_id: string) => Promise<Profile>;
@@ -11,5 +11,6 @@ export interface IProfileDataPort {
   findByText: (
     params: TextSearchableQueryParams
   ) => Promise<TextSearchableQuery<Profile>>;
-  findByEmail(email: string): Promise<Profile | undefined>;
+  findByEmail: (email: string) => Promise<Profile | undefined>;
+  findByDocument: (document: IDocument) => Promise<Profile | undefined>;
 }

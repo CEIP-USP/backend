@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwtRefreshCookieService } from './jwt-cookie.service';
-import { Profile } from '../../domain/profile';
-import { RoleType } from '../../domain/role';
+import { Profile } from '../../../domain/profile';
+import { RoleType } from '../../../domain/role';
 
 export enum TokenTypes {
   Access = 'access',
@@ -18,6 +18,7 @@ export type RefreshJWTPayload = {
 } & TokenPayload;
 
 export type AccessJWTPayload = {
+  _id: string;
   name: string;
   email: string;
   role: RoleType;
@@ -50,6 +51,7 @@ export class JwtService {
 
   signAccess(res: Response, profile: Profile): void {
     const payload: Omit<AccessJWTPayload, 'sub'> = {
+      _id: profile._id.toJSON(),
       name: profile.name,
       email: profile.email,
       type: TokenTypes.Access,

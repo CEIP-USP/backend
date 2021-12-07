@@ -5,10 +5,12 @@ import {
   TextSearchableQuery,
   TextSearchableQueryParams,
 } from 'common/pagedQuery';
+import joi from 'joi';
 import { ObjectId } from 'bson';
+import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
+import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
 
 export interface PreRegistrationData {
-  id: string;
   name: string;
   email: string;
   password: string;
@@ -19,10 +21,26 @@ export interface PreRegistrationData {
   document: IDocument;
 }
 
-export default class ProfileUseCases {
-  constructor(private readonly profileDataPort: IProfileDataPort) {}
+const preRegistrationSchema = joi.object({
+  name: joi.string().required(),
+  email: joi.string().email().required(),
+  password: joi.string().required().min(8),
+  hasSecondShot: joi.boolean().optional(),
+  document: joi
+    .object<IDocument>({
+      type: joi.string().required(),
+      value: joi.string().required(),
+    })
+    .required(),
+  phone: joi.string().optional(),
+  address: joi.string().optional(),
+  dayOfSecondShot: joi.date().optional(),
+});
 
-  public performPreRegistration({
+export default class ProfileUseCases {
+  constructor(private readonly profileDataPort: IProfileDataPort) { }
+
+  public async performPreRegistration({
     name,
     email,
     password,
@@ -32,8 +50,27 @@ export default class ProfileUseCases {
     address,
     dayOfSecondShot,
   }: PreRegistrationData): Promise<Profile> {
+    joi.assert(
+      {
+        name,
+        email,
+        password,
+        document,
+        phone,
+        address,
+        dayOfSecondShot,
+      },
+      preRegistrationSchema
+    );
+
+    if (await this.profileDataPort.findByEmail(email)) {
+      throw new EmailAlreadyRegisteredError(email);
+    }
+    if (await this.profileDataPort.findByDocument(document)) {
+      throw new DocumentAlreadyRegisteredError(document);
+    }
+
     const profile = new Profile(
-      new ObjectId(),
       name,
       email,
       password,
@@ -41,7 +78,9 @@ export default class ProfileUseCases {
       document,
       phone,
       address,
-      dayOfSecondShot
+      dayOfSecondShot,
+      undefined,
+      new ObjectId()
     );
     return this.profileDataPort.save(profile);
   }
@@ -50,6 +89,14 @@ export default class ProfileUseCases {
     const profile = await this.profileDataPort.findById(id);
     profile.roles.push(newRole);
     return this.profileDataPort.save(profile);
+  }
+
+  public async removeRole(id: string, roleName: string): Promise<any> {
+    const profile = await this.profileDataPort.findById(id);
+    profile.roles = profile.roles.filter(
+      (role: Role) => role.name !== roleName
+    );
+    return await this.profileDataPort.save(profile);
   }
 
   public findByText(

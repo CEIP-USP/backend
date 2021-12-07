@@ -1,4 +1,4 @@
-import { Profile } from '../../domain/profile';
+import { Profile } from '../../../domain/profile';
 import { Strategy as LocalStrategy } from 'passport-local';
 
 export const LocalStrategyFactory: (
