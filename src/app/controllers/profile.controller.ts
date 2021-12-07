@@ -91,7 +91,7 @@ export class ProfileController {
           phone: profile.phone,
           adress: profile.address,
           dayOfSecondShot: profile.dayOfSecondShot?.toISOString(),
-          role: profile.role,
+          roles: profile.roles,
           _id: profile._id,
         });
       else res.status(404).send();
@@ -168,11 +168,6 @@ export class ProfileController {
     );
     this._router.put('/:id/role', this.addRole.bind(this));
     this._router.delete('/:id/role/:roleName', this.removeRole.bind(this));
-    this._router.put(
-      '/:id/role',
-      this.accessTokenMiddleware,
-      this.updateRole.bind(this)
-    );
     this._router.get(
       '/:id',
       this.accessTokenMiddleware,
