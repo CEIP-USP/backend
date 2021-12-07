@@ -77,7 +77,25 @@ export class ProfileController {
     }
   }
 
-  private async updateRole(req: Request, res: Response) {
+  private async removeRole(req: Request, res: Response) {
+    try {
+      const result = await this.profileUseCases.removeRole(
+        req.params.id,
+        req.params.roleName
+      );
+      res.json(result).status(200);
+    } catch (e) {
+      const exception = e as Error;
+      console.error(e);
+      if (exception instanceof InvalidRoleType) {
+        res.status(422).send();
+      } else {
+        res.status(500).send();
+      }
+    }
+  }
+
+  private async addRole(req: Request, res: Response) {
     try {
       const result = await this.profileUseCases.addRole(
         req.params.id,
@@ -102,6 +120,7 @@ export class ProfileController {
       this.accessTokenMiddleware,
       this.getProfile.bind(this)
     );
-    this._router.put('/:id/role', this.updateRole.bind(this));
+    this._router.put('/:id/role', this.addRole.bind(this));
+    this._router.delete('/:id/role/:roleName', this.removeRole.bind(this));
   }
 }

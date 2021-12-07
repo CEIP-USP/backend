@@ -17,7 +17,7 @@ const documentToProfile = ({
   phone,
   address,
   dayOfSecondShot,
-  role,
+  roles,
 }: Document) => {
   return new Profile(
     name,
@@ -28,7 +28,7 @@ const documentToProfile = ({
     phone,
     address,
     dayOfSecondShot,
-    role,
+    roles,
     _id
   );
 };

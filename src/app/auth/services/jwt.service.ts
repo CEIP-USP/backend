@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwtRefreshCookieService } from './jwt-cookie.service';
 import { Profile } from '../../../domain/profile';
-import { RoleType } from '../../../domain/role';
+import { Role } from '../../../domain/role';
 
 export enum TokenTypes {
   Access = 'access',
@@ -21,7 +21,7 @@ export type AccessJWTPayload = {
   _id: string;
   name: string;
   email: string;
-  role: RoleType;
+  role: Role[];
   type: TokenTypes.Access;
 } & TokenPayload;
 
@@ -55,7 +55,7 @@ export class JwtService {
       name: profile.name,
       email: profile.email,
       type: TokenTypes.Access,
-      role: profile.role.name,
+      role: profile.roles,
     };
     const token = jwt.sign(payload, this.secret, {
       subject: profile.email,
