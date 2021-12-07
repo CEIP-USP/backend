@@ -55,7 +55,7 @@ export class Profile {
     phone = '',
     address = '',
     dayOfSecondShot: Date | undefined = undefined,
-    roles: Role[] = [new Role(RoleType.Usuario)]
+    roles: Role[] = []
   ): Promise<Profile> {
     return new Profile(
       name,
