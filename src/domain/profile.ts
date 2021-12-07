@@ -1,7 +1,7 @@
 import { ObjectId } from 'bson';
-import bcrypt from 'bcryptjs';
 import { InvalidSecondShotDateError } from './exceptions/InvalidSecondShotDateError';
-import { Role, RoleType } from './role';
+import { ProfileCredentials } from './profileCredentials';
+import { Role } from './role';
 
 export interface IDocument {
   type: string;
@@ -23,13 +23,13 @@ export class Profile {
   constructor(
     public name: string,
     public email: string,
-    public password: string,
+    public credentials: ProfileCredentials,
     hasSecondShot: boolean,
     public document: IDocument,
     public phone = '',
     public address = '',
     public dayOfSecondShot: Date | undefined = undefined,
-    _roles: Role[] = [new Role(RoleType.Usuario)],
+    _roles: Role[] = [],
     public _id: ObjectId = new ObjectId()
   ) {
     if (!Profile.validateDayOfSecondShot(dayOfSecondShot))
@@ -49,7 +49,7 @@ export class Profile {
   static async create(
     name: string,
     email: string,
-    password: string,
+    credentials: ProfileCredentials,
     hasSecondShot: boolean,
     document: IDocument,
     phone = '',
@@ -60,7 +60,7 @@ export class Profile {
     return new Profile(
       name,
       email,
-      await Profile.hashPassword(password),
+      credentials,
       hasSecondShot,
       document,
       phone,
@@ -74,13 +74,5 @@ export class Profile {
     if (!date || isNaN(date.getTime())) return false;
     const now = new Date();
     return now.getTime() > date.getTime();
-  }
-
-  private static async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, await bcrypt.genSalt(10));
-  }
-
-  public verifyPassword(password: string): boolean | Promise<boolean> {
-    return bcrypt.compare(password, this.password);
   }
 }

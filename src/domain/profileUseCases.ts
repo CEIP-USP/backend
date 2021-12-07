@@ -8,6 +8,7 @@ import {
 import joi from 'joi';
 import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
+import { ProfileCredentials } from './profileCredentials';
 
 export interface PreRegistrationData {
   name: string;
@@ -68,11 +69,14 @@ export default class ProfileUseCases {
     if (await this.profileDataPort.findByDocument(document)) {
       throw new DocumentAlreadyRegisteredError(document);
     }
-
+    const profileCredentials = new ProfileCredentials(
+      email,
+      await ProfileCredentials.hashPassword(password)
+    );
     const profile = await Profile.create(
       name,
       email,
-      password,
+      profileCredentials,
       hasSecondShot,
       document,
       phone,
@@ -112,7 +116,7 @@ export default class ProfileUseCases {
   ): Promise<Profile | undefined> {
     const profile = await this.profileDataPort.findByEmail(email);
     if (!profile) return undefined;
-    if (await profile.verifyPassword(password)) return profile;
+    if (await profile.credentials.verifyPassword(password)) return profile;
     return undefined;
   }
 }
