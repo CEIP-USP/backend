@@ -79,7 +79,7 @@ export class ProfileController {
 
   private async updateRole(req: Request, res: Response) {
     try {
-      const result = await this.profileUseCases.updateRole(
+      const result = await this.profileUseCases.addRole(
         req.params.id,
         new Role(req.body.newRole)
       );
