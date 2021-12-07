@@ -38,7 +38,7 @@ const preRegistrationSchema = joi.object({
 });
 
 export default class ProfileUseCases {
-  constructor(private readonly profileDataPort: IProfileDataPort) { }
+  constructor(private readonly profileDataPort: IProfileDataPort) {}
 
   public async performPreRegistration({
     name,
