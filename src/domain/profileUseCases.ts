@@ -85,10 +85,18 @@ export default class ProfileUseCases {
     return this.profileDataPort.save(profile);
   }
 
-  public async updateRole(id: string, newRole: Role): Promise<Profile> {
+  public async addRole(id: string, newRole: Role): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
-    profile.role = newRole;
+    profile.roles.push(newRole);
     return this.profileDataPort.save(profile);
+  }
+
+  public async removeRole(id: string, roleName: string): Promise<Profile> {
+    const profile = await this.profileDataPort.findById(id);
+    profile.roles = profile.roles.filter(
+      (role: Role) => role.name !== roleName
+    );
+    return await this.profileDataPort.save(profile);
   }
 
   public findByText(

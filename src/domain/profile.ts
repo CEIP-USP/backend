@@ -17,6 +17,8 @@ export class Profile {
   public responsibleForValidation = '';
   public readonly vaccineStatus: VaccineStatus;
 
+  public roles: Role[];
+
   constructor(
     public name: string,
     public email: string,
@@ -26,11 +28,13 @@ export class Profile {
     public phone = '',
     public address = '',
     public dayOfSecondShot: Date | undefined = undefined,
-    public role: Role = new Role(RoleType.User),
+    _roles: Role[] = [new Role(RoleType.User)],
     public _id: ObjectId = new ObjectId()
   ) {
     if (!Profile.validateDayOfSecondShot(dayOfSecondShot))
       throw new InvalidSecondShotDateError();
+
+    this.roles = _roles;
 
     const status: VaccineStatus = { vaccinated: hasSecondShot };
 
@@ -39,10 +43,6 @@ export class Profile {
     }
 
     this.vaccineStatus = status;
-  }
-
-  public set _role(role: Role) {
-    this.role = role;
   }
 
   static validateDayOfSecondShot(date?: Date): boolean {
