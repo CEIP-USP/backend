@@ -11,14 +11,13 @@ import { JwtService } from './app/auth/services/jwt.service';
 import { AccessTokenStrategyFactory } from './app/auth/strategies/access-token.strategy-factory';
 import { RefreshTokenStrategyFactory } from './app/auth/strategies/refresh-token.strategy-factory';
 import { AuthController } from './app/controllers/auth.controller';
-import { useCors } from './app/web/cors';
+import { customCors } from './app/web/custom-cors';
 
 const app: Application = express();
 app.use(passport.initialize());
 app.use(json());
 app.use(cookies());
-
-useCors(app);
+app.use(customCors());
 
 async function main() {
   try {
