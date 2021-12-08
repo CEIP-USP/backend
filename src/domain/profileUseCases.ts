@@ -9,6 +9,7 @@ import joi from 'joi';
 import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
 import { ProfileCredentials } from './profileCredentials';
+import { ProfileNotFoundError } from './exceptions/ProfileNotFoundError';
 
 export interface PreRegistrationData {
   name: string;
@@ -88,16 +89,24 @@ export default class ProfileUseCases {
 
   public async addRole(id: string, newRole: Role): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
     profile.roles.push(newRole);
     return this.profileDataPort.save(profile);
   }
 
   public async removeRole(id: string, roleName: string): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
     profile.roles = profile.roles.filter(
       (role: Role) => role.name !== roleName
     );
     return await this.profileDataPort.save(profile);
+  }
+
+  public findById(id: string): Promise<Profile | undefined> {
+    return this.profileDataPort.findById(id);
   }
 
   public findByText(
@@ -118,5 +127,15 @@ export default class ProfileUseCases {
     if (!profile) return undefined;
     if (await profile.credentials.verifyPassword(password)) return profile;
     return undefined;
+  }
+
+  public async updatePassword(
+    id: string,
+    newPassword: string
+  ): Promise<Profile> {
+    const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new Error('Profile not found');
+    await profile.credentials.setPassword(newPassword);
+    return this.profileDataPort.save(profile);
   }
 }

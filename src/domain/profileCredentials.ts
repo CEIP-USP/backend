@@ -10,4 +10,8 @@ export class ProfileCredentials {
   public static async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, await bcrypt.genSalt(10));
   }
+
+  public async setPassword(password: string): Promise<void> {
+    this.password = await ProfileCredentials.hashPassword(password);
+  }
 }

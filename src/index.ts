@@ -1,7 +1,6 @@
 import express, { Application, json, Request, Response } from 'express';
 import { ProfileController } from './app/controllers/profile.controller';
 import ProfileUseCases from './domain/profileUseCases';
-import cors from 'cors';
 import setupDb from './app/database';
 import { ProfileDataAdapter } from './app/adapters/profileDataAdapter';
 import { Db } from 'mongodb';
@@ -12,12 +11,13 @@ import { JwtService } from './app/auth/services/jwt.service';
 import { AccessTokenStrategyFactory } from './app/auth/strategies/access-token.strategy-factory';
 import { RefreshTokenStrategyFactory } from './app/auth/strategies/refresh-token.strategy-factory';
 import { AuthController } from './app/controllers/auth.controller';
+import { customCors } from './app/web/custom-cors';
 
 const app: Application = express();
 app.use(passport.initialize());
 app.use(json());
-app.use(cors({ credentials: true, origin: process.env.CORS }));
 app.use(cookies());
+app.use(customCors());
 
 async function main() {
   try {
@@ -54,7 +54,8 @@ async function main() {
 
     const controller = new ProfileController(
       profileUseCases,
-      authMiddlewares.accessToken
+      authMiddlewares.accessToken,
+      authMiddlewares.local
     );
 
     app.use('/auth', authController.router);

@@ -21,7 +21,7 @@ export type AccessJWTPayload = {
   _id: string;
   name: string;
   email: string;
-  role: Role[];
+  roles: Role[];
   type: TokenTypes.Access;
 } & TokenPayload;
 
@@ -55,7 +55,7 @@ export class JwtService {
       name: profile.name,
       email: profile.email,
       type: TokenTypes.Access,
-      role: profile.roles,
+      roles: profile.roles,
     };
     const token = jwt.sign(payload, this.secret, {
       subject: profile.email,

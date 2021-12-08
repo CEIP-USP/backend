@@ -6,13 +6,15 @@ import ProfileUseCases from '../../domain/profileUseCases';
 import { ValidationError } from 'joi';
 import { EmailAlreadyRegisteredError } from '../../domain/exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from '../../domain/exceptions/DocumentAlreadyRegisteredError';
+import { Profile } from '../../domain/profile';
 
 export class ProfileController {
   private readonly _router: Router;
 
   constructor(
     protected readonly profileUseCases: ProfileUseCases,
-    protected readonly accessTokenMiddleware: RequestHandler
+    protected readonly accessTokenMiddleware: RequestHandler,
+    protected readonly usernamePasswordMiddleware: RequestHandler
   ) {
     this._router = Router();
     this.mapRoutes();
@@ -77,6 +79,28 @@ export class ProfileController {
     }
   }
 
+  private async getProfileByID(req: Request, res: Response) {
+    try {
+      const id = req.params.id + '';
+      const profile = await this.profileUseCases.findById(id);
+      if (profile)
+        res.status(200).json({
+          name: profile.name,
+          email: profile.email,
+          document: profile.document,
+          phone: profile.phone,
+          adress: profile.address,
+          dayOfSecondShot: profile.dayOfSecondShot?.toISOString(),
+          roles: profile.roles,
+          _id: profile._id,
+        });
+      else res.status(404).send();
+    } catch (err) {
+      console.error(err);
+      res.status(500).send();
+    }
+  }
+
   private async removeRole(req: Request, res: Response) {
     try {
       const profile = await this.profileUseCases.removeRole(
@@ -113,7 +137,29 @@ export class ProfileController {
     }
   }
 
+  private async updatePassword(req: Request, res: Response) {
+    try {
+      const profile = req.user as Profile;
+      if (profile._id.toString() !== req.params.id)
+        return res.status(403).send();
+
+      const result = await this.profileUseCases.updatePassword(
+        profile._id + '',
+        req.body.newPassword + ''
+      );
+      res.json(result).status(200);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send();
+    }
+  }
+
   private mapRoutes() {
+    this._router.put(
+      '/:id/password',
+      this.usernamePasswordMiddleware,
+      this.updatePassword.bind(this)
+    );
     this._router.post('/', this.preRegister.bind(this));
     this._router.get(
       '/',
@@ -122,5 +168,10 @@ export class ProfileController {
     );
     this._router.put('/:id/role', this.addRole.bind(this));
     this._router.delete('/:id/role/:roleName', this.removeRole.bind(this));
+    this._router.get(
+      '/:id',
+      this.accessTokenMiddleware,
+      this.getProfileByID.bind(this)
+    );
   }
 }
