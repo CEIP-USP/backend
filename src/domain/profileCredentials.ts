@@ -11,7 +11,7 @@ export class ProfileCredentials {
     return bcrypt.hash(password, await bcrypt.genSalt(10));
   }
 
-  public async setPassword(password: string): Promise<void> {
-    this.password = await ProfileCredentials.hashPassword(password);
+  public setPassword(password: string): void {
+    this.password = password;
   }
 }

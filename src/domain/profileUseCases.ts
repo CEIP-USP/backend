@@ -135,7 +135,10 @@ export default class ProfileUseCases {
   ): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
     if (!profile) throw new Error('Profile not found');
-    await profile.credentials.setPassword(newPassword);
+    const hashedNewPassword = await ProfileCredentials.hashPassword(
+      newPassword
+    );
+    profile.credentials.setPassword(hashedNewPassword);
     return this.profileDataPort.save(profile);
   }
 }
