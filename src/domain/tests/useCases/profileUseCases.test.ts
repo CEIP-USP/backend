@@ -139,16 +139,20 @@ describe(ProfileUseCases, () => {
 
   describe('update profile', () => {
     it('should update profiles name and email', async () => {
-      // AAA
-      // Arrange
       const profileChanges = {
         name: 'Ronaldo',
         email: 'ronaldo2@ronaldo.com',
+        document: {
+          type: 'cpf',
+          value: '123.123.123-40',
+        },
       };
       const id = '1234-5678';
       const expected = profileMock();
 
-      (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(expected);
+      (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(
+        Object.assign({}, expected)
+      );
 
       await profileUseCases.updateProfile(id, profileChanges);
 
@@ -156,6 +160,7 @@ describe(ProfileUseCases, () => {
         ...expected,
         name: profileChanges.name,
         email: profileChanges.email,
+        document: profileChanges.document,
       });
     });
   });
