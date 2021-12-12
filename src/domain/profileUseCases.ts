@@ -9,6 +9,7 @@ import joi from 'joi';
 import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
 import { ProfileNotFoundError } from './exceptions/ProfileNotFoundError';
+import { ProfileChangingDto } from './dtos/profileChangingDto';
 
 export interface PreRegistrationData {
   name: string;
@@ -132,6 +133,24 @@ export default class ProfileUseCases {
     const profile = await this.profileDataPort.findById(id);
     if (!profile) throw new Error('Profile not found');
     await profile.setPassword(newPassword);
+    return this.profileDataPort.save(profile);
+  }
+
+  public async updateProfile(
+    id: string,
+    profileChanges: ProfileChangingDto
+  ): Promise<Profile> {
+    const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
+    if (profileChanges.name) profile.name = profileChanges.name;
+    if (profileChanges.email) profile.email = profileChanges.email;
+    if (profileChanges.document) profile.document = profileChanges.document;
+    if (profileChanges.phone) profile.phone = profileChanges.phone;
+    if (profileChanges.address) profile.address = profileChanges.address;
+    if (profileChanges.dayOfSecondShot)
+      profile.dayOfSecondShot = profileChanges.dayOfSecondShot;
+
     return this.profileDataPort.save(profile);
   }
 }

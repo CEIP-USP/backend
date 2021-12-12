@@ -137,28 +137,26 @@ describe(ProfileUseCases, () => {
     });
   });
 
-  // describe('update profile', () => {
-  //   it('should update profiles name and email', () => {
-  //     // AAA
-  //     // Arrange
-  //     const updatedProfile = {
-  //       name: 'Ronaldo',
-  //       email: 'ronaldo2@ronaldo.com',
-  //     };
-  //     const id = '1234-5678';
-  //     const expected = profileMock();
+  describe('update profile', () => {
+    it('should update profiles name and email', async () => {
+      // AAA
+      // Arrange
+      const profileChanges = {
+        name: 'Ronaldo',
+        email: 'ronaldo2@ronaldo.com',
+      };
+      const id = '1234-5678';
+      const expected = profileMock();
 
-  //     (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(expected);
+      (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(expected);
 
-  //     // Act
-  //     profileUseCases.updateProfile(id, updatedProfile);
+      await profileUseCases.updateProfile(id, profileChanges);
 
-  //     // Assert
-  //     (profileDataPort.save as jest.Mock).mock.calls[0][0].name.toEqual({
-  //       ...expected,
-  //       name: updatedProfile.name,
-  //       email: updatedProfile.email,
-  //     });
-  //   });
-  // });
+      expect((profileDataPort.save as jest.Mock).mock.calls[0][0]).toEqual({
+        ...expected,
+        name: profileChanges.name,
+        email: profileChanges.email,
+      });
+    });
+  });
 });
