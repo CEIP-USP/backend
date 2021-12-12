@@ -7,7 +7,7 @@ import { ValidationError } from 'joi';
 import { EmailAlreadyRegisteredError } from '../../domain/exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from '../../domain/exceptions/DocumentAlreadyRegisteredError';
 import { Profile } from '../../domain/profile';
-import { ProfileNotFoundError } from 'domain/exceptions/ProfileNotFoundError';
+import { ProfileNotFoundError } from '../../domain/exceptions/ProfileNotFoundError';
 
 export class ProfileController {
   private readonly _router: Router;
@@ -159,16 +159,16 @@ export class ProfileController {
     try {
       const profile = await this.profileUseCases.updateProfile(
         req.params.id,
-        req.body.profileChanges
+        req.body
       );
       res.json(profile).status(200);
     } catch (e) {
       const exception = e as Error;
       console.error(e);
       if (exception instanceof ProfileNotFoundError) {
-        res.status(404).send();
+        res.status(404).json({ message: exception.message });
       } else {
-        res.status(500).send();
+        res.status(500).json({ message: exception.message });
       }
     }
   }
