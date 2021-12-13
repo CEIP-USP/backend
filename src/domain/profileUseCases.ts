@@ -150,25 +150,19 @@ export default class ProfileUseCases {
     const profile = await this.profileDataPort.findById(id);
     if (!profile) throw new ProfileNotFoundError('id', id);
 
-    let { name, email, document, phone, address, dayOfSecondShot } = profile;
-
-    if (profileChanges.name) name = profileChanges.name;
-    if (profileChanges.email) email = profileChanges.email;
-    if (profileChanges.document) document = profileChanges.document;
-    if (profileChanges.phone) phone = profileChanges.phone;
-    if (profileChanges.address) address = profileChanges.address;
-    if (profileChanges.dayOfSecondShot)
-      dayOfSecondShot = profileChanges.dayOfSecondShot;
+    const { name, email, document, phone, address, dayOfSecondShot } = profile;
 
     const newProfile = new Profile(
-      name,
-      email,
+      profileChanges.name ? profileChanges.name : name,
+      profileChanges.email ? profileChanges.email : email,
       profile.credentials,
       dayOfSecondShot ? true : false,
-      document,
-      phone,
-      address,
-      dayOfSecondShot,
+      profileChanges.document ? profileChanges.document : document,
+      profileChanges.phone ? profileChanges.phone : phone,
+      profileChanges.address ? profileChanges.address : address,
+      profileChanges.dayOfSecondShot
+        ? profileChanges.dayOfSecondShot
+        : dayOfSecondShot,
       profile.roles,
       profile._id
     );
