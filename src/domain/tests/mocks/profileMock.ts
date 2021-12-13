@@ -1,11 +1,12 @@
 import { Role } from '../../role';
 import { Profile } from '../../profile';
+import { ProfileCredentials } from '../../profileCredentials';
 
 const profileMock = (): Profile =>
   new Profile(
     'Susan',
     'pearline_hin@hotmail.com',
-    '1234',
+    new ProfileCredentials('pearline_hin@hotmail.com', 'h45h3d'),
     true,
     {
       type: 'cpf',

@@ -8,6 +8,7 @@ import {
 import joi from 'joi';
 import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegisteredError';
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
+import { ProfileCredentials } from './profileCredentials';
 import { ProfileNotFoundError } from './exceptions/ProfileNotFoundError';
 
 export interface PreRegistrationData {
@@ -69,11 +70,14 @@ export default class ProfileUseCases {
     if (await this.profileDataPort.findByDocument(document)) {
       throw new DocumentAlreadyRegisteredError(document);
     }
-
+    const profileCredentials = new ProfileCredentials(
+      email,
+      await ProfileCredentials.hashPassword(password)
+    );
     const profile = await Profile.create(
       name,
       email,
-      password,
+      profileCredentials,
       hasSecondShot,
       document,
       phone,
@@ -121,7 +125,7 @@ export default class ProfileUseCases {
   ): Promise<Profile | undefined> {
     const profile = await this.profileDataPort.findByEmail(email);
     if (!profile) return undefined;
-    if (await profile.verifyPassword(password)) return profile;
+    if (await profile.credentials.verifyPassword(password)) return profile;
     return undefined;
   }
 
@@ -131,7 +135,10 @@ export default class ProfileUseCases {
   ): Promise<Profile> {
     const profile = await this.profileDataPort.findById(id);
     if (!profile) throw new Error('Profile not found');
-    await profile.setPassword(newPassword);
+    const hashedNewPassword = await ProfileCredentials.hashPassword(
+      newPassword
+    );
+    profile.credentials.setPassword(hashedNewPassword);
     return this.profileDataPort.save(profile);
   }
 }

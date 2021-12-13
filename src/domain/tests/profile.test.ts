@@ -1,5 +1,6 @@
 import { Profile } from '../profile';
 import { InvalidSecondShotDateError } from '../exceptions/InvalidSecondShotDateError';
+import { ProfileCredentials } from '../profileCredentials';
 
 describe('Profile', () => {
   describe('Day of second shot validation', () => {
@@ -7,7 +8,7 @@ describe('Profile', () => {
       Profile.create(
         'John Doe',
         'john.doe@gmail.com',
-        '@BlaBlaBla123',
+        new ProfileCredentials('john.doe@gmail.com', '@BlaBlaBla123'),
         true,
         { type: 'cpf', value: '123.456.789-00' },
         '12345678900',
