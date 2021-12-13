@@ -143,14 +143,29 @@ export default class ProfileUseCases {
     const profile = await this.profileDataPort.findById(id);
     if (!profile) throw new ProfileNotFoundError('id', id);
 
-    if (profileChanges.name) profile.name = profileChanges.name;
-    if (profileChanges.email) profile.email = profileChanges.email;
-    if (profileChanges.document) profile.document = profileChanges.document;
-    if (profileChanges.phone) profile.phone = profileChanges.phone;
-    if (profileChanges.address) profile.address = profileChanges.address;
-    if (profileChanges.dayOfSecondShot)
-      profile.dayOfSecondShot = profileChanges.dayOfSecondShot;
+    let { name, email, document, phone, address, dayOfSecondShot } = profile;
 
-    return this.profileDataPort.save(profile);
+    if (profileChanges.name) name = profileChanges.name;
+    if (profileChanges.email) email = profileChanges.email;
+    if (profileChanges.document) document = profileChanges.document;
+    if (profileChanges.phone) phone = profileChanges.phone;
+    if (profileChanges.address) address = profileChanges.address;
+    if (profileChanges.dayOfSecondShot)
+      dayOfSecondShot = profileChanges.dayOfSecondShot;
+
+    const newProfile = new Profile(
+      name,
+      email,
+      profile.password,
+      dayOfSecondShot ? true : false,
+      document,
+      phone,
+      address,
+      dayOfSecondShot,
+      profile.roles,
+      profile._id
+    );
+
+    return this.profileDataPort.save(newProfile);
   }
 }
