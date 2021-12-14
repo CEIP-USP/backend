@@ -8,6 +8,7 @@ import { EmailAlreadyRegisteredError } from '../../domain/exceptions/EmailAlread
 import { DocumentAlreadyRegisteredError } from '../../domain/exceptions/DocumentAlreadyRegisteredError';
 import { Profile } from '../../domain/profile';
 import { ProfileNotFoundError } from '../../domain/exceptions/ProfileNotFoundError';
+import { ProfileChangingDto } from 'domain/dtos/profileChangingDto';
 
 export class ProfileController {
   private readonly _router: Router;
@@ -159,7 +160,7 @@ export class ProfileController {
     try {
       const profile = await this.profileUseCases.updateProfile(
         req.params.id,
-        req.body
+        new ProfileChangingDto(...req.body)
       );
       res.json(profile).status(200);
     } catch (e) {

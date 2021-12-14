@@ -1,10 +1,12 @@
 import { IDocument } from 'domain/profile';
 
-export interface ProfileChangingDto {
-  name?: string;
-  email?: string;
-  document?: IDocument;
-  phone?: string;
-  address?: string;
-  dayOfSecondShot?: Date;
+export class ProfileChangingDto {
+  constructor(
+    public name?: string,
+    public email?: string,
+    public document?: IDocument,
+    public phone?: string,
+    public address?: string,
+    public dayOfSecondShot?: Date
+  ) {}
 }
