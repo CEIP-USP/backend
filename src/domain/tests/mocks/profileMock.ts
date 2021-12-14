@@ -15,7 +15,7 @@ const profileMock = (): Profile =>
     undefined,
     undefined,
     new Date(2021, 1, 31),
-    [new Role('Usuario')]
+    [new Role('Usuário')]
   );
 
 export default profileMock;
