@@ -1,12 +1,18 @@
-import { IDocument } from 'domain/profile';
+import { IDocument } from '../profile';
 
 export class ProfileChangingDto {
+  public dayOfSecondShot?: Date;
+
   constructor(
     public name?: string,
     public email?: string,
     public document?: IDocument,
     public phone?: string,
     public address?: string,
-    public dayOfSecondShot?: Date
-  ) {}
+    dayOfSecondShot?: string
+  ) {
+    this.dayOfSecondShot = dayOfSecondShot
+      ? new Date(dayOfSecondShot)
+      : undefined;
+  }
 }
