@@ -33,7 +33,7 @@ describe(ProfileUseCases, () => {
 
       expect(
         (profileDataPort.save as jest.Mock).mock.calls[0][0].roles
-      ).toEqual([new Role('Usuario'), role]);
+      ).toEqual([new Role('Usuário'), role]);
     });
   });
 
@@ -50,7 +50,7 @@ describe(ProfileUseCases, () => {
 
       expect(
         (profileDataPort.save as jest.Mock).mock.calls[0][0].roles
-      ).toEqual([new Role('Usuario')]);
+      ).toEqual([new Role('Usuário')]);
     });
   });
 

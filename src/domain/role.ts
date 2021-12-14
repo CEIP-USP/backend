@@ -1,20 +1,20 @@
 import { InvalidRoleType } from './exceptions/InvalidRoleType';
 
 export class Role {
-  public name: RoleType;
+  public name: string;
 
-  constructor(_role: string) {
-    const newRole = RoleType[_role as keyof typeof RoleType];
-    if (!newRole) throw new InvalidRoleType(_role);
-    this.name = newRole;
+  constructor(role: string) {
+    const validRole = RoleType.includes(role);
+    if (!validRole) throw new InvalidRoleType(role);
+    this.name = role;
   }
 }
 
-export enum RoleType {
-  Usuario = 'Usuario',
-  ControladorDeAcesso = 'ControladorDeAcesso',
-  Atendente = 'Atendente',
-  ResponsavelPorAtendente = 'ResponsavelPorAtendente',
-  CoordenacaoDeServico = 'CoordenacaoDeServico',
-  GestaoDeServico = 'GestaoDeServico',
-}
+const RoleType = [
+  'Usuário',
+  'Controlador de Acesso',
+  'Atendente',
+  'Responsável por Atendente',
+  'Coordenação de Serviço',
+  'Gestão CEIP',
+];
