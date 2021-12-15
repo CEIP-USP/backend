@@ -6,7 +6,9 @@ const createProfileCollectionIndexes = async (collection: Collection) => {
   });
 };
 
-export default async (dbName = 'CEIP'): Promise<Db | undefined> => {
+export default async (
+  dbName = process.env.DBNAME || 'CEIP'
+): Promise<Db | undefined> => {
   const url = process.env.MONGO_URL || 'mongodb://db:27017/';
   const profileCollectionName =
     process.env.MONGO_PROFILE_COLLECTION || 'profiles';
