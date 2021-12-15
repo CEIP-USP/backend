@@ -38,7 +38,7 @@ export class ProfileDataAdapter implements IProfileDataPort {
 
   constructor(database: Db) {
     this.profileCollection = database.collection(
-      process.env.PROFILE_COLLECTION + ''
+      process.env.PROFILE_COLLECTION + '' || 'profiles'
     );
   }
 
@@ -67,6 +67,11 @@ export class ProfileDataAdapter implements IProfileDataPort {
       _id,
     });
     return documentToProfile(savedProfile as Document);
+  };
+
+  delete = async (_id: ObjectId): Promise<void> => {
+    console.log((await this.profileCollection.find({ _id: _id }).toArray())[0]);
+    await this.profileCollection.deleteOne({ _id });
   };
 
   async findByText(

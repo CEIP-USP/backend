@@ -11,6 +11,7 @@ describe(ProfileUseCases, () => {
   const profileDataPort: IProfileDataPort = {
     findById: jest.fn(() => Promise.resolve(profileMock())),
     save: jest.fn(),
+    delete: jest.fn(),
     findByEmail: jest.fn(),
     findByText: jest.fn(),
     findByDocument: jest.fn(),
