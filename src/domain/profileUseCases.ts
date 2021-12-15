@@ -10,6 +10,7 @@ import { EmailAlreadyRegisteredError } from './exceptions/EmailAlreadyRegistered
 import { DocumentAlreadyRegisteredError } from './exceptions/DocumentAlreadyRegisteredError';
 import { ProfileCredentials } from './profileCredentials';
 import { ProfileNotFoundError } from './exceptions/ProfileNotFoundError';
+import { ProfileChangingDto } from './dtos/profileChangingDto';
 
 export interface PreRegistrationData {
   name: string;
@@ -140,5 +141,32 @@ export default class ProfileUseCases {
     );
     profile.credentials.setPassword(hashedNewPassword);
     return this.profileDataPort.save(profile);
+  }
+
+  public async updateProfile(
+    id: string,
+    profileChanges: ProfileChangingDto
+  ): Promise<Profile> {
+    const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
+    const { name, email, document, phone, address, dayOfSecondShot } = profile;
+
+    const newProfile = new Profile(
+      profileChanges.name ? profileChanges.name : name,
+      profileChanges.email ? profileChanges.email : email,
+      profile.credentials,
+      dayOfSecondShot ? true : false,
+      profileChanges.document ? profileChanges.document : document,
+      profileChanges.phone ? profileChanges.phone : phone,
+      profileChanges.address ? profileChanges.address : address,
+      profileChanges.dayOfSecondShot
+        ? profileChanges.dayOfSecondShot
+        : dayOfSecondShot,
+      profile.roles,
+      profile._id
+    );
+
+    return this.profileDataPort.save(newProfile);
   }
 }
