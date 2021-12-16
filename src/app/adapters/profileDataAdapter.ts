@@ -6,12 +6,13 @@ import {
   TextSearchableQueryParams,
 } from '../../common/pagedQuery';
 import { ObjectId } from 'bson';
+import { ProfileCredentials } from '../../domain/profileCredentials';
 
 const documentToProfile = ({
   _id,
   name,
   email,
-  password,
+  credentials: { password },
   hasSecondShot,
   document,
   phone,
@@ -22,7 +23,7 @@ const documentToProfile = ({
   return new Profile(
     name,
     email,
-    password,
+    new ProfileCredentials(email, password),
     hasSecondShot,
     document,
     phone,
