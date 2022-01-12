@@ -11,6 +11,7 @@ describe(ProfileUseCases, () => {
   const profileDataPort: IProfileDataPort = {
     findById: jest.fn(() => Promise.resolve(profileMock())),
     save: jest.fn(),
+    delete: jest.fn(),
     findByEmail: jest.fn(),
     findByText: jest.fn(),
     findByDocument: jest.fn(),
@@ -162,6 +163,23 @@ describe(ProfileUseCases, () => {
         email: profileChanges.email,
         document: profileChanges.document,
       });
+    });
+  });
+
+  describe('delete profile', () => {
+    it('should delete a profile', async () => {
+      const id = '1234-5678';
+      const expected = { _id: id };
+
+      (profileDataPort.findById as jest.Mock).mockResolvedValueOnce(
+        Object.assign({}, expected)
+      );
+
+      await profileUseCases.deleteProfile(id);
+
+      expect((profileDataPort.delete as jest.Mock).mock.calls[0][0]).toEqual(
+        id
+      );
     });
   });
 });

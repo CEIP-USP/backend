@@ -169,4 +169,11 @@ export default class ProfileUseCases {
 
     return this.profileDataPort.save(newProfile);
   }
+
+  public async deleteProfile(id: string): Promise<void> {
+    const profile = await this.profileDataPort.findById(id);
+    if (!profile) throw new ProfileNotFoundError('id', id);
+
+    this.profileDataPort.delete(profile._id);
+  }
 }
