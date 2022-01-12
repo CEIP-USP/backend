@@ -186,7 +186,7 @@ export class ProfileController {
   private async deleteProfile(req: Request, res: Response) {
     try {
       await this.profileUseCases.deleteProfile(req.params.id);
-      res.status(200);
+      res.status(200).send();
     } catch (e) {
       const exception = e as Error;
       console.error(e);
