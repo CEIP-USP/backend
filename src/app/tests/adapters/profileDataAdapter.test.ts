@@ -2,6 +2,8 @@ import { Collection, Db, ObjectId } from 'mongodb';
 import { ProfileDataAdapter } from '../../adapters/profileDataAdapter';
 import DBMock from '../DBMock';
 
+const profileCollectionName = process.env.PROFILE_COLLECTION || 'profiles';
+
 describe(ProfileDataAdapter, () => {
   let profileDataAdapter: ProfileDataAdapter;
 
@@ -14,7 +16,7 @@ describe(ProfileDataAdapter, () => {
   });
 
   beforeEach(async () => {
-    await dbMock.cleanup(['profiles']);
+    await dbMock.cleanup([profileCollectionName]);
   });
 
   afterAll(() => {
@@ -26,8 +28,8 @@ describe(ProfileDataAdapter, () => {
     const _id = new ObjectId('61aeb66c3708fa247a45f1ff');
 
     beforeEach(async () => {
-      profilesCollection = db.collection('profiles');
-      await db.collection('profiles').insertOne({
+      profilesCollection = db.collection(profileCollectionName);
+      await profilesCollection.insertOne({
         name: 'John Doe',
         email: 'john.oe13@gmail.com',
         password: '12345678',
@@ -52,9 +54,9 @@ describe(ProfileDataAdapter, () => {
 
     it('should delete profile', async () => {
       await profileDataAdapter.delete(_id);
-      expect(
-        (await profilesCollection.find({ _id: _id }).toArray()).length
-      ).toEqual(0);
+
+      const profileArray = await profilesCollection.find().toArray();
+      expect(profileArray.length).toEqual(0);
     });
   });
 });
