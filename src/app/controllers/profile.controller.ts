@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response, Router } from 'express';
 import { InvalidRoleType } from '../../domain/exceptions/InvalidRoleType';
-import { Role } from '../../domain/role';
+import { Role, RoleTypes } from '../../domain/role';
 import { InvalidSecondShotDateError } from '../../domain/exceptions/InvalidSecondShotDateError';
 import ProfileUseCases from '../../domain/profileUseCases';
 import { ValidationError } from 'joi';
@@ -9,6 +9,9 @@ import { DocumentAlreadyRegisteredError } from '../../domain/exceptions/Document
 import { Profile } from '../../domain/profile';
 import { ProfileNotFoundError } from '../../domain/exceptions/ProfileNotFoundError';
 import { ProfileChangingDto } from '../../domain/dtos/profileChangingDto';
+import { authorizationStrategyMiddleware } from '../auth/middlewares/authorization-strategy.middleware';
+import { IsOwnerOrHasRoleAuthorizationStrategy } from '../auth/authorization/is-owner-or-has-role.authorization-strategy';
+import { RequireRoleAuthorizationStrategy } from '../auth/authorization/require-role.authorization-strategy';
 
 export class ProfileController {
   private readonly _router: Router;
@@ -24,6 +27,32 @@ export class ProfileController {
 
   public get router(): Router {
     return this._router;
+  }
+
+  private static authorizationMethods() {
+    return {
+      ownerOrOperator: authorizationStrategyMiddleware(
+        new IsOwnerOrHasRoleAuthorizationStrategy([
+          RoleTypes.ATENDENTE,
+          RoleTypes.GESTAO_CEIP,
+          RoleTypes.CONTROLADOR_DE_ACESSO,
+          RoleTypes.COORDENACAO_DE_SERVICO,
+          RoleTypes.RESPONSAVEL_POR_ATENDENTE,
+        ])
+      ),
+      operator: authorizationStrategyMiddleware(
+        new RequireRoleAuthorizationStrategy([
+          RoleTypes.ATENDENTE,
+          RoleTypes.GESTAO_CEIP,
+          RoleTypes.CONTROLADOR_DE_ACESSO,
+          RoleTypes.COORDENACAO_DE_SERVICO,
+          RoleTypes.RESPONSAVEL_POR_ATENDENTE,
+        ])
+      ),
+      management: authorizationStrategyMiddleware(
+        new RequireRoleAuthorizationStrategy([RoleTypes.GESTAO_CEIP])
+      ),
+    };
   }
 
   private async preRegister(req: Request, res: Response) {
@@ -91,7 +120,7 @@ export class ProfileController {
           email: profile.email,
           document: profile.document,
           phone: profile.phone,
-          adress: profile.address,
+          address: profile.address,
           dayOfSecondShot: profile.dayOfSecondShot?.toISOString(),
           roles: profile.roles,
           _id: profile._id,
@@ -142,8 +171,6 @@ export class ProfileController {
   private async updatePassword(req: Request, res: Response) {
     try {
       const profile = req.user as Profile;
-      if (profile._id.toString() !== req.params.id)
-        return res.status(403).send();
 
       const result = await this.profileUseCases.updatePassword(
         profile._id + '',
@@ -199,25 +226,50 @@ export class ProfileController {
   }
 
   private mapRoutes() {
+    const authz = ProfileController.authorizationMethods();
+
     this._router.put(
       '/:id/password',
       this.usernamePasswordMiddleware,
+      authz.ownerOrOperator,
       this.updatePassword.bind(this)
     );
     this._router.post('/', this.preRegister.bind(this));
     this._router.get(
       '/',
       this.accessTokenMiddleware,
+      authz.operator,
       this.getProfile.bind(this)
     );
-    this._router.put('/:id/role', this.addRole.bind(this));
-    this._router.delete('/:id/role/:roleName', this.removeRole.bind(this));
+    this._router.put(
+      '/:id/role',
+      this.accessTokenMiddleware,
+      authz.management,
+      this.addRole.bind(this)
+    );
+    this._router.delete(
+      '/:id/role/:roleName',
+      this.accessTokenMiddleware,
+      authz.management,
+      this.removeRole.bind(this)
+    );
     this._router.get(
       '/:id',
       this.accessTokenMiddleware,
+      authz.ownerOrOperator,
       this.getProfileByID.bind(this)
     );
-    this._router.put('/:id', this.updateProfile.bind(this));
-    this._router.delete('/:id', this.deleteProfile.bind(this));
+    this._router.put(
+      '/:id',
+      this.accessTokenMiddleware,
+      authz.ownerOrOperator,
+      this.updateProfile.bind(this)
+    );
+    this._router.delete(
+      '/:id',
+      this.accessTokenMiddleware,
+      authz.ownerOrOperator,
+      this.deleteProfile.bind(this)
+    );
   }
 }
